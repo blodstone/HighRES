@@ -1,3 +1,6 @@
+<!--
+Main page.
+-->
 <template>
   <div id="app">
     <div id="nav">
