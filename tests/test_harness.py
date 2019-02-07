@@ -1,3 +1,4 @@
+import http
 from flask_testing import TestCase
 from backend.app import create_app
 from backend.model import db
@@ -37,6 +38,5 @@ class HarnessTest(TestCase):
         self.assertEqual(result.data, response.json)
 
     def test_get_dataset_user(self):
-        response = self.client.get('/dataset/1')
-        result = DatasetSchema().dump(Dataset.query.get(1))
-        self.assertEqual(result.data, response.json)
+        response = self.client.get('/dataset/2')
+        self.assertEqual(404, response.status_code)

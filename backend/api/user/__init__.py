@@ -10,7 +10,7 @@ user_api.config = {}
 api = Api()
 api.init_app(user_api)
 api.add_resource(DatasetsResource, '/dataset')
-api.add_resource(DatasetResource, '/dataset/<int:id>')
+api.add_resource(DatasetResource, '/dataset/<int:dataset_id>')
 
 
 @user_api.record
