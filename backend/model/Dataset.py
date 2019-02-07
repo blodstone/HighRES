@@ -13,10 +13,17 @@ class DatasetSchema(ma.ModelSchema):
         model = Dataset
 
 
-class DatasetResource(Resource):
+class DatasetsResource(Resource):
 
     def get(self):
         datasets = Dataset.query.all()
         datasets_schema = DatasetSchema(many=True)
         result = datasets_schema.dump(datasets)
         return result
+
+
+class DatasetResource(Resource):
+
+    def get(self, id):
+        dataset = Dataset.query.get(id)
+        return DatasetSchema().dump(dataset)

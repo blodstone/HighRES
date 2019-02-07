@@ -3,12 +3,13 @@ Initialize Flask Blueprint for api.
 """
 from flask import Blueprint
 from backend.model import api
-from backend.model.Dataset import DatasetResource
+from backend.model.Dataset import DatasetsResource, DatasetResource
 
 bp_api = Blueprint('api', 'api', url_prefix='', static_folder='../../instance/dist/static')
 bp_api.config = {}
 api.init_app(bp_api)
-api.add_resource(DatasetResource, '/dataset')
+api.add_resource(DatasetsResource, '/dataset')
+api.add_resource(DatasetResource, '/dataset/<int:id>')
 
 
 @bp_api.record

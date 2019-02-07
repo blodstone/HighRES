@@ -24,4 +24,9 @@ class HarnessTest(TestCase):
     def test_get_datasets(self):
         response = self.client.get('/dataset')
         result = DatasetSchema(many=True).dump(Dataset.query.all())
-        self.assertEquals(response.json, result.data)
+        self.assertEqual(response.json, result.data)
+
+    def test_get_dataset(self):
+        response = self.client.get('/dataset/1')
+        result = DatasetSchema().dump(Dataset.query.get(1))
+        self.assertEqual(response.json, result.data)
