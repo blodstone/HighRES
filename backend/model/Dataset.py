@@ -1,4 +1,5 @@
 from backend.model import db, ma
+from flask_restful import Resource
 
 
 class Dataset(db.Model):
@@ -10,3 +11,12 @@ class Dataset(db.Model):
 class DatasetSchema(ma.ModelSchema):
     class Meta:
         model = Dataset
+
+
+class DatasetResource(Resource):
+
+    def get(self):
+        datasets = Dataset.query.all()
+        datasets_schema = DatasetSchema(many=True)
+        result = datasets_schema.dump(datasets)
+        return result

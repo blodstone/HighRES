@@ -1,8 +1,12 @@
 """
 Initialize Flask application.
 """
+import os
+
 from flask import Flask, render_template
-from backend.api import api
+
+from backend.api import bp_api
+from backend.model import db, ma
 
 
 class CustomFlask(Flask):
@@ -21,14 +25,27 @@ class CustomFlask(Flask):
     ))
 
 
-def create_app():
+def create_app(config, is_testing):
     """
     Create the app for flask run
     """
     app = CustomFlask(__name__, instance_relative_config=True,
                       static_folder='../../instance/dist/static',
                       template_folder='../../instance/dist')
-    app.register_blueprint(api)
+    app.register_blueprint(bp_api)
+    if is_testing:
+        app.config['TESTING'] = config.TESTING
+        db_uri = config.SQLALCHEMY_DATABASE_URI
+    else:
+        db_uri = os.getenv('db_uri')
+    app.config.from_mapping(
+        SECRET_KEY=os.getenv('SECRET_KEY'),
+        SQLALCHEMY_DATABASE_URI=db_uri,
+        SQLALCHEMY_TRACK_MODIFICATIONS=True,
+    )
+    db.init_app(app)
+    ma.init_app(app)
+
 
     @app.route('/')
     def index():
