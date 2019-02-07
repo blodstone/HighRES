@@ -1,16 +1,6 @@
-from backend.model import db, ma
 from flask_restful import Resource
 
-
-class Dataset(db.Model):
-    __tablename__ = 'dataset'
-    id = db.Column(db.INTEGER, primary_key=True, nullable=False)
-    name = db.Column(db.String(255), nullable=False)
-
-
-class DatasetSchema(ma.ModelSchema):
-    class Meta:
-        model = Dataset
+from backend.model.dataset import Dataset, DatasetSchema
 
 
 class DatasetsResource(Resource):
@@ -23,7 +13,6 @@ class DatasetsResource(Resource):
 
 
 class DatasetResource(Resource):
-
     def get(self, id):
         dataset = Dataset.query.get(id)
         return DatasetSchema().dump(dataset)

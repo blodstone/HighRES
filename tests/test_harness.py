@@ -1,7 +1,7 @@
 from flask_testing import TestCase
 from backend.app import create_app
-from backend.model import db, ma
-from backend.model.Dataset import Dataset, DatasetSchema
+from backend.model import db
+from backend.model.dataset import Dataset, DatasetSchema
 
 
 class HarnessTest(TestCase):
@@ -21,12 +21,22 @@ class HarnessTest(TestCase):
     def test_setup(self):
         self.assertTrue(self.app is not None)
 
-    def test_get_datasets(self):
+    def test_get_datasets_admin(self):
+        response = self.client.get('/admin/dataset')
+        result = DatasetSchema(many=True).dump(Dataset.query.all())
+        self.assertEqual(result.data, response.json)
+
+    def test_get_dataset_admin(self):
+        response = self.client.get('/admin/dataset/1')
+        result = DatasetSchema().dump(Dataset.query.get(1))
+        self.assertEqual(result.data, response.json)
+
+    def test_get_datasets_user(self):
         response = self.client.get('/dataset')
         result = DatasetSchema(many=True).dump(Dataset.query.all())
-        self.assertEqual(response.json, result.data)
+        self.assertEqual(result.data, response.json)
 
-    def test_get_dataset(self):
+    def test_get_dataset_user(self):
         response = self.client.get('/dataset/1')
         result = DatasetSchema().dump(Dataset.query.get(1))
-        self.assertEqual(response.json, result.data)
+        self.assertEqual(result.data, response.json)

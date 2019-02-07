@@ -5,7 +5,8 @@ import os
 
 from flask import Flask, render_template
 
-from backend.api import bp_api
+from backend.api.admin import admin_api
+from backend.api.user import user_api
 from backend.model import db, ma
 
 
@@ -29,10 +30,11 @@ def create_app(config, is_testing):
     """
     Create the app for flask run
     """
-    app = CustomFlask(__name__, instance_relative_config=True,
+    app = CustomFlask('backend', instance_relative_config=True,
                       static_folder='../../instance/dist/static',
                       template_folder='../../instance/dist')
-    app.register_blueprint(bp_api)
+    app.register_blueprint(admin_api, url_prefix='/admin')
+    app.register_blueprint(user_api)
     if is_testing:
         app.config['TESTING'] = config.TESTING
         db_uri = config.SQLALCHEMY_DATABASE_URI
