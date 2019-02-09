@@ -39,7 +39,7 @@ def create_app(config, is_testing):
         app.config['TESTING'] = config.TESTING
         db_uri = config.SQLALCHEMY_DATABASE_URI
     else:
-        db_uri = os.getenv('db_uri')
+        db_uri = os.getenv('DB_URI')
     app.config.from_mapping(
         SECRET_KEY=os.getenv('SECRET_KEY'),
         SQLALCHEMY_DATABASE_URI=db_uri,
@@ -47,6 +47,9 @@ def create_app(config, is_testing):
     )
     db.init_app(app)
     ma.init_app(app)
+
+    if os.getenv('INIT_DB'):
+        __init_db()
 
     @app.route('/')
     def index():
@@ -64,3 +67,7 @@ def create_app(config, is_testing):
         return make_response((body, headers))
 
     return app
+
+
+def __init_db():
+    pass
