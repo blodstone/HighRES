@@ -5,7 +5,7 @@ from flask import Blueprint
 from flask_restful import Api
 from .resource.dataset import DatasetsResource, DatasetResource
 
-admin_api = Blueprint('admin_api', __name__)
+admin_api = Blueprint('admin_api', __name__, static_folder='../../instance/dist/static')
 admin_api.config = {}
 api = Api()
 api.init_app(admin_api)

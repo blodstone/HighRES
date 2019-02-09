@@ -3,7 +3,10 @@
  */
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from './views/Home.vue';
+import Home from './components/admin/Home.vue';
+import Admin from './views/admin/Admin.vue';
+import NewProject from './components/admin/ProjectMenu/NewProject.vue';
+import NewEvaluation from './components/admin/ProjectMenu/NewEvaluation.vue';
 
 Vue.use(Router);
 
@@ -11,16 +14,51 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: Home,
+      redirect: {
+        name: 'admin',
+      },
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/About.vue'),
+      path: '/admin',
+      component: Admin,
+      children: [
+        {
+          path: '',
+          name: 'admin',
+          component: Home,
+        },
+        {
+          path: 'new',
+          component: NewProject,
+          children: [
+            {
+              path: '',
+              name: 'new',
+              component: NewEvaluation,
+            },
+            {
+              path: 'evaluation',
+              name: 'newEvaluation',
+              component: NewEvaluation,
+            },
+          ],
+        // },
+        // {
+        //   path: 'manage',
+        //   name: 'manage',
+        //   component: ManageProject,
+        // },
+        // {
+        //   path: 'annotation_status/:project_id',
+        //   name: 'annotation_status',
+        //   component: AnnotationStatus,
+        // },
+        // {
+        //   path: 'evaluation_status/:project_id',
+        //   name: 'evaluation_status',
+        //   component: EvaluationStatus,
+        },
+      ],
     },
   ],
 });

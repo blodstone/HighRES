@@ -3,7 +3,7 @@ Initialize Flask application.
 """
 import os
 
-from flask import Flask, render_template
+from flask import Flask, render_template, make_response
 
 from backend.api.admin import admin_api
 from backend.api.user import user_api
@@ -30,7 +30,7 @@ def create_app(config, is_testing):
     """
     Create the app for flask run
     """
-    app = CustomFlask('backend', instance_relative_config=True,
+    app = CustomFlask(__name__, instance_relative_config=True,
                       static_folder='../../instance/dist/static',
                       template_folder='../../instance/dist')
     app.register_blueprint(admin_api, url_prefix='/admin')
@@ -48,12 +48,19 @@ def create_app(config, is_testing):
     db.init_app(app)
     ma.init_app(app)
 
-
     @app.route('/')
     def index():
         """
         Render the vue generated html
         """
         return render_template('index.html')
+
+    @app.route('/app.js')
+    def send_app_js():
+        headers = {"Content-Disposition": "attachment; filename=%s" % 'app.js'}
+        path = os.path.join(app.instance_path, 'dist', 'app.js')
+        with open(path, 'r') as f:
+            body = f.read()
+        return make_response((body, headers))
 
     return app
