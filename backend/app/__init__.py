@@ -49,7 +49,11 @@ def create_app(config, is_testing):
     ma.init_app(app)
 
     if os.getenv('INIT_DB'):
-        __init_db()
+        db_config = {
+            'init_dataset': os.getenv('INIT_DATASET'),
+            'dataset_path': os.getenv('DATASET_PATH')
+        }
+        __init_db(db_config)
 
     @app.route('/')
     def index():
@@ -69,5 +73,5 @@ def create_app(config, is_testing):
     return app
 
 
-def __init_db():
+def __init_db(db_config):
     pass

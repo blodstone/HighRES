@@ -19,7 +19,7 @@ class Document(db.Model):
     # For checking whether doc_json is empty or not
     has_highlight = db.Column(db.Boolean, nullable=False, default=False)
 
-    doc_statuses = db.relationship('DocStatus', backref='document', lazy=True)
+    # doc_statuses = db.relationship('DocStatus', backref='document', lazy=True)
 
     dataset_id = db.Column(db.INTEGER, db.ForeignKey('dataset.id'), nullable=True)
 
