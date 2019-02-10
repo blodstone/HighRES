@@ -1,6 +1,5 @@
-import http
 from flask_testing import TestCase
-from backend.app import create_app
+from backend.app import create_app, init_db
 from backend.model import db
 from backend.model.dataset import Dataset, DatasetSchema
 
@@ -14,7 +13,11 @@ class HarnessTest(TestCase):
         return app
 
     def setUp(self):
-        db.create_all()
+        db_config = {
+            'init_dataset': 1,
+            'dataset_path': '/home/acp16hh/Projects/Research/Experiments/Exp_Elly_Human_Evaluation/src/harness/dataset/BBC'
+        }
+        init_db(db_config)
         dataset = Dataset(name="test_dataset")
         db.session.add(dataset)
         db.session.commit()
