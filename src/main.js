@@ -7,10 +7,10 @@ import 'buefy/dist/buefy.css';
 import 'bulma-slider/dist/css/bulma-slider.min.css';
 import App from './App.vue';
 import router from './router';
-
 Vue.config.productionTip = false;
 Vue.use(Buefy);
 new Vue({
-  router,
-  render: (h) => h(App),
+    router,
+    render: (h) => h(App),
 }).$mount('#app');
+//# sourceMappingURL=main.js.map

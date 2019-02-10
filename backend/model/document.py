@@ -6,7 +6,7 @@ class Document(db.Model):
 
     id = db.Column(db.INTEGER, primary_key=True, nullable=False)
     doc_id = db.Column(db.String(25), nullable=False)
-    doc_json = db.Column(db.Text, nullable=False)
+    doc_json = db.Column(db.JSON, nullable=False)
 
     # For ground truth comparison
     sanity_statement = db.Column(db.Text, nullable=True)

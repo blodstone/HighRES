@@ -3,14 +3,13 @@ Initialize Flask Blueprint for admin api.
 """
 from flask import Blueprint
 from flask_restful import Api
-from .resource.dataset import DatasetsResource, DatasetResource
+from .resource.new_project import DatasetsResource
 
 admin_api = Blueprint('admin_api', __name__, static_folder='../../instance/dist/static')
 admin_api.config = {}
 api = Api()
 api.init_app(admin_api)
 api.add_resource(DatasetsResource, '/dataset')
-api.add_resource(DatasetResource, '/dataset/<int:id>')
 
 
 @admin_api.record

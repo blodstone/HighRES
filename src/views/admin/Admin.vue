@@ -1,13 +1,10 @@
-<!--
-Main Admin page (load Home as its component)
--->
 <template>
   <div>
     <nav class="navbar" role="navigation" aria-label="main navigation">
       <div class="container is-fluid">
         <div class="navbar-brand">
           <a href="/" class="navbar-item">
-            Harness
+            Summ-Eval
           </a>
         </div>
           <div id="navbarBasicExample" class="navbar-menu">
@@ -33,9 +30,12 @@ Main Admin page (load Home as its component)
   </div>
 </template>
 
-<script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+<script>
+// @ is an alias to /src
 
-@Component
-export default class Admin extends Vue {}
+export default {
+  name: 'admin',
+  components: {
+  },
+};
 </script>
