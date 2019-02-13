@@ -40,15 +40,17 @@
                         </p>
                         <p class="my-text">
                             <b-tooltip
-                                    label="Do the summary has all the important
-                                     information of the reference sentence?">
+                                    label="How much trouble did you have identifying
+                                    the referents of nounphrases in this summary?
+                                    Are there nouns, pronouns or personal names that are
+                                    not well-specified?">
                                 <b-icon
                                     pack="fas"
                                     icon="info-circle"
                                     size="is-small">
                                 </b-icon>
                             </b-tooltip>
-                            <strong>All important</strong> information is present in the summary
+                          The summary has a <strong>clear reference</strong>.
                         </p>
                         <div class="level" align="center"
                              style="margin-bottom: 1.8rem; margin-top: 1.8rem;">
@@ -65,15 +67,41 @@
                         </div>
                         <p class="my-text">
                             <b-tooltip
-                                    label="Do the summary only has important
-                                     information (in accordance to reference)?">
+                                    label="Are there any obviously ungrammatical sentences,
+                                    e.g.,missing components, unrelated fragments or any other
+                                    grammar-related problem that makes the text diffcult toread? ">
                                 <b-icon
                                     pack="fas"
                                     icon="info-circle"
                                     size="is-small">
                                 </b-icon>
                             </b-tooltip>
-                            <strong>Only important</strong> information is in the summary.</p>
+                            The summary is <strong>grammatically</strong> correct.</p>
+                        <div class="level" align="center"
+                             style="margin-bottom: 1.8rem; margin-top: 1.8rem;">
+                            <span class="level-left">
+                                <label class="label is-small">Strongly <br/> disagree</label>
+                            </span>
+                            <span class="level-item">
+                           <vue-slider min=1 max=100 v-model="precision"
+                                       v-if="show" width="100%"></vue-slider>
+                            </span>
+                            <span class="level-right">
+                                <label class="label is-small">Strongly <br/> agree</label>
+                            </span>
+                        </div>
+                        <p class="my-text">
+                            <b-tooltip
+                              label="Are there any datelines, system-internal
+                              formatting orcapitalization errors that can make the reading
+                              of the summary difficult?">
+                                <b-icon
+                                    pack="fas"
+                                    icon="info-circle"
+                                    size="is-small">
+                                </b-icon>
+                            </b-tooltip>
+                          The summary has no noticeable <strong>formatting problem</strong>.</p>
                         <div class="level" align="center"
                              style="margin-bottom: 1.8rem; margin-top: 1.8rem;">
                             <span class="level-left">
@@ -207,7 +235,7 @@ async function getFile() {
       this.showMessage('Server is busy! Please wait 3 minutes and refresh!');
     });
   console.log(this.arr);
-  insertSanitySumms.call(this);
+  await insertSanitySumms.call(this);
 }
 
 function sendResult(resultJSON) {
