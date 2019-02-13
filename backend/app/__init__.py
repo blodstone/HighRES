@@ -12,7 +12,7 @@ from backend.api.user import user_api
 from backend.model import db, ma
 from backend.model.dataset import Dataset
 from backend.model.document import Document
-from backend.model.summary import Summary, SummaryGroup
+from backend.model.summary import Summary, SummaryGroup, SanitySummary
 
 
 class CustomFlask(Flask):
@@ -53,6 +53,7 @@ def create_app(config, is_testing):
         SECRET_KEY=os.getenv('SECRET_KEY'),
         SQLALCHEMY_DATABASE_URI=db_uri,
         SQLALCHEMY_TRACK_MODIFICATIONS=True,
+        DEBUG_TB_PROFILER_ENABLED=True
     )
     db.init_app(app)
     ma.init_app(app)
@@ -88,6 +89,7 @@ def init_db(dataset_path, db):
     documents_path = os.path.join(dataset_path, 'documents')
     sanity_path = os.path.join(dataset_path, 'sanity')
     sanity_2_path = os.path.join(dataset_path, 'sanity_2')
+    sanity_summ_path = os.path.join(dataset_path, 'sanity_summary')
 
     # Insert dataset
     dataset = Dataset(name=dataset_name)
@@ -143,4 +145,19 @@ def init_db(dataset_path, db):
                 )
                 db.session.add(summary)
                 db.session.commit()
+
+    # Insert sanity summaries
+    for file in os.listdir(sanity_summ_path):
+        file_path = os.path.join(sanity_summ_path, file)
+        with open(file_path, 'r') as infile:
+            json_infile = json.load(infile)
+            sanity_summary = SanitySummary(
+                best_summary=json_infile['best'].lower(),
+                avg_summary=json_infile['average'].lower(),
+                worst_summary=json_infile['worst'].lower(),
+                dataset_id=dataset.id
+            )
+            db.session.add(sanity_summary)
+            db.session.commit()
+
 

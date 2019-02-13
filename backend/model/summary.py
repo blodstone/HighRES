@@ -29,9 +29,30 @@ class SummaryGroup(db.Model):
     is_ref = db.Column(db.Boolean, nullable=False, default=False)
 
     dataset_id = db.Column(db.INTEGER, db.ForeignKey('dataset.id'), nullable=False)
-    summaries = db.relationship('Summary', backref='summary_group', lazy=True)
+    summaries = db.relationship('Summary', backref='summary_group')
 
 
 class SummaryGroupSchema(ma.ModelSchema):
     class Meta:
         model = SummaryGroup
+        include_fk = True
+
+
+class SanitySummary(db.Model):
+    """
+    For sanity checking where user's submission is deemed valid
+    if the best_summary >= avg_summary > worst_summary
+    """
+    __tablename__ = 'sanity_summary'
+
+    id = db.Column(db.INTEGER, primary_key=True, nullable=False)
+    best_summary = db.Column(db.Text, nullable=False)
+    avg_summary = db.Column(db.Text, nullable=False)
+    worst_summary = db.Column(db.Text, nullable=False)
+
+    dataset_id = db.Column(db.INTEGER, db.ForeignKey('dataset.id'), nullable=False)
+
+
+class SanitySummarySchema(ma.ModelSchema):
+    class Meta:
+        model = SanitySummary

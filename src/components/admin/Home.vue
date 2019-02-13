@@ -3,7 +3,7 @@
       <div class="hero-body">
         <div class="container">
           <h1 class="title">
-            Welcome to Summ-Eval!
+            Welcome to HArnESS!
           </h1>
           <h2 class="subtitle">
             An open source manual evaluation software for abstractive summarization!

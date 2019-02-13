@@ -1,5 +1,5 @@
 from backend.model import db, ma
-from .summary import SummaryGroupSchema
+from backend.model.summary import SummaryGroupSchema
 
 
 class Dataset(db.Model):
@@ -12,4 +12,4 @@ class Dataset(db.Model):
 class DatasetSchema(ma.ModelSchema):
     class Meta:
         model = Dataset
-    summ_groups = ma.Nested(SummaryGroupSchema, many=True, only=('name', ))
+    summ_groups = ma.Nested(SummaryGroupSchema, many=True)

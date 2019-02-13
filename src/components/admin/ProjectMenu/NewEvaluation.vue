@@ -8,25 +8,22 @@
         <b-field horizontal label="Category">
             <b-select placeholder="Select evaluation category" v-model="project.category"
                       icon="wrench" icon-pack="fas">
-                <option value="Informativeness_Doc">Informativeness on Document
-                    with Highlight</option>
-                <option value="Informativeness_Doc_No">Informativeness on Document
-                    without Highlight</option>
-                <option value="Informativeness_Ref">Informativeness on Reference</option>
                 <option value="Fluency">Fluency</option>
             </b-select>
         </b-field>
-        <b-field horizontal label="Dataset">
+        <b-field horizontal label="Dataset" v-if="datasets">
             <b-select placeholder="Select a dataset"
-                      v-model="project.dataset_name" icon="database" icon-pack="fas">
-                <option v-for="name in names.dataset" :value="name" :key="name">{{ name }}</option>
+                      v-model="project.dataset" icon="database" icon-pack="fas">
+                <option v-for="x in datasets" :value="x" :key="x.name">
+                  {{ x.name }}
+                </option>
             </b-select>
         </b-field>
-        <b-field horizontal label="Summary Group">
-            <b-select placeholder="Select a summary group" v-model="project.summ_group_name"
+        <b-field horizontal label="Summary Group" v-if="project.dataset">
+            <b-select placeholder="Select a summary group" v-model="project.summ_group"
                       icon="file" icon-pack="fas">
-                <option v-for="name in names.summ_group"
-                        :value="name" :key="name">{{ name }}</option>
+                <option v-for="x in project.dataset.summ_groups"
+                        :value="x" :key="x.name">{{ x.name }}</option>
             </b-select>
         </b-field>
             <!--TODO: Handling error when user input 0-->
@@ -45,14 +42,11 @@ export default {
   name: 'NewEvaluation',
   data() {
     return {
-      names: {
-        dataset: [],
-        summ_group: [],
-      },
+      datasets: null,
       project: {
         name: '',
-        dataset_name: null,
-        sum_group_name: null,
+        dataset: null,
+        summ_group: null,
         category: null,
         total_exp_results: 1,
       },
@@ -60,7 +54,7 @@ export default {
   },
   methods: {
     createProject() {
-      axios.post('/project/evaluation', this.project)
+      axios.put('admin/project/evaluation', this.project)
         .then(() => {
           this.$toast.open({
             message: 'Project created!',
@@ -77,32 +71,15 @@ export default {
     },
   },
   mounted() {
-    axios.get('dataset')
+    axios.get('admin/dataset')
       .then((response) => {
-        if (response.status === 204) {
+        if (response.status === 404) {
           this.$toast.open({
-            message: 'There is no dataset in database. Please insert dataset first!',
+            message: response.statusText,
             type: 'is-danger',
           });
         } else {
-          this.names.dataset = response.data.names;
-        }
-      })
-      .catch((error) => {
-        this.$toast.open({
-          message: `${error}`,
-          type: 'is-danger',
-        });
-      });
-    axios.get('summ_group')
-      .then((response) => {
-        if (response.status === 204) {
-          this.$toast.open({
-            message: 'There is no summary group in database. Please insert summary group first!',
-            type: 'is-danger',
-          });
-        } else {
-          this.names.summ_group = response.data.names;
+          this.datasets = response.data;
         }
       })
       .catch((error) => {

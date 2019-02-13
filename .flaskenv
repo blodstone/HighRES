@@ -10,7 +10,7 @@ FLASK_DEBUG=1
 SECRET_KEY=b'\xcf\xdcp\xe0\xbd;\xd4%#\x16\xdf\x05\xfc\xcd_\x0f'
 
 # Change this in accordance to the server setting
-DB_URI="mysql://root:wildanimus@localhost/harness"
+DB_URI="mysql://root:wildanimus@localhost/harness_test"
 
 
 # Uncomment this to initialize dataset (document, summary and the sanity questions)

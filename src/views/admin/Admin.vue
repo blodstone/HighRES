@@ -35,7 +35,5 @@
 
 export default {
   name: 'admin',
-  components: {
-  },
 };
 </script>
