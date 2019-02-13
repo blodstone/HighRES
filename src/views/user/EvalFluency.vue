@@ -28,9 +28,8 @@
                         <p>
                             Hover the mouse on top of the
                             <b-tooltip
-                                    label="You should treat that all words
-                                    in the reference sentence as important,
-                                    and words that don't appear in reference as not important.">
+                                    label="Don't forget to enter the m_turk code
+                                    at the end of the session.">
                                 <b-icon
                                     pack="fas"
                                     icon="info-circle"
@@ -69,7 +68,8 @@
                             <b-tooltip
                                     label="Are there any obviously ungrammatical sentences,
                                     e.g.,missing components, unrelated fragments or any other
-                                    grammar-related problem that makes the text diffcult toread? ">
+                                    grammar-related problem that makes the
+                                    text difficult to read? ">
                                 <b-icon
                                     pack="fas"
                                     icon="info-circle"
@@ -93,7 +93,7 @@
                         <p class="my-text">
                             <b-tooltip
                               label="Are there any datelines, system-internal
-                              formatting orcapitalization errors that can make the reading
+                              formatting or capitalization errors that can make the reading
                               of the summary difficult?">
                                 <b-icon
                                     pack="fas"
@@ -115,17 +115,15 @@
                                 <label class="label is-small">Strongly <br/> agree</label>
                             </span>
                         </div>
-                        <div align="center">
-                          <button class="button is-primary" v-on:click="prev">
-                            Prev
-                          </button>
-                          <div>
-                            {{page.current}}/{{page.total}}
-                          </div>
-                          <button class="button is-primary" v-on:click="next">
-                            Next
-                          </button>
-                        </div>
+                        <button class="button is-primary" v-on:click="prev">
+                          Prev
+                        </button>
+                          <strong>
+                          {{page.current}}/{{page.total}}
+                          </strong>
+                        <button class="button is-primary" v-on:click="next">
+                          Next
+                        </button>
                     </div>
                 </div>
             </div>

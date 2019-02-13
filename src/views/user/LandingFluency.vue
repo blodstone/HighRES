@@ -4,38 +4,44 @@
         <h1 align="center">
             Please Read This Thoroughly Before You Consent!
         </h1>
-        <h3>This task requires two steps:</h3>
-        <h4><strong>Step 1: Informativeness Assessment</strong></h4>
-        <p>Your task is to assess the <strong>informativeness</strong> of a single summary sentence given one reference sentence. The task should be possible to complete in less than <strong>1 minutes</strong>.</p>
+        <p>Your task is to assess the <strong>fluency</strong> of a single summary sentence. There are at most 8 summaries that need to be evaluated. The task should be possible to complete in less than <strong>3 minutes</strong>.</p>
         <hr/>
-        <p><strong>You have to assess the summary on two metrics:</strong></p>
+        <p><strong>You have to assess the summary on three metrics:</strong></p>
         <blockquote>
-            <strong>All important</strong> information is present in the summary
+             The summary has a <strong>clear reference</strong>.
         </blockquote>
-        <p><strong>Meaning:</strong> The summary has all the important information of the sentence.</p>
+        <p><strong>Meaning:</strong> All the the referents of nounphrases in this summary are easily identifiable, i.e.: All the nouns, pronouns or personal names are well-specified?.</p>
         <blockquote>
-            <strong>Only important</strong> information is in the summary.
+            The summary is <strong>grammatically</strong> correct.
         </blockquote>
-        <p><strong>Meaning:</strong> All information in the summary is important (in accordance to reference).</p>
-        <p><strong>Note:</strong>You should treat that all words in the reference sentence as important, and words that don't appear in reference as not important.</p>
-        <p>An example assessment of one reference sentence and two summaries:</p>
+        <p><strong>Meaning:</strong> There any no obviously ungrammatical sentences,
+                                    e.g.,missing components, unrelated fragments or any other
+                                    grammar-related problem that makes the
+                                    text difficult to read.</p>
         <blockquote>
-            <strong>Reference</strong><br/>
-            David Robert Joseph Beckham is an English retired professional footballer and current President of Inter Miami CF.
+            The summary has no noticeable <strong>formatting problem</strong>
+        </blockquote>
+        <p><strong>Meaning:</strong> There are no datelines, system-internal
+                              formatting or capitalization errors that can make the reading
+                              of the summary difficult.</p>
+
+        <p>An example assessment of one bad summary in each category:</p>
+        <blockquote>
+            <strong>No Clear Reference</strong><br/>
+          <a class="highlight">He</a>, born 2 May 1975, is a English retired professional footballer and current President of Inter Miami CF since .
+        </blockquote>
+       <blockquote>
+            <strong>Grammatically wrong</strong><br/>
+          David Robert Joseph Beckham, born 2 May 1975, <a class="highlight">are a</a> English retired professional footballer and current <a class="highlight">current</a> President of Inter Miami CF.
         </blockquote>
         <blockquote>
-            <strong>Summary A</strong><br />
-            As <a class="highlight">the President of Inter Miami CF</a>, <a class="highlight">David Beckham</a>, <a class="highlight">a retired English footballer</a>, is known for his crossing ability.
-            <br/>
-            <strong>Summary B</strong><br />
-            <a class="highlight">David Beckham is a retired English footballer</a>
+            <strong>Formatting Problem</strong><br/>
+          David Robert Joseph Beckham, born <a class="highlight">02051975</a>, is a English retired <a class="highlight">&lt;UNK&gt;</a> footballer and current President of Inter Miami CF.
         </blockquote>
-        <strong>All important information in the reference sentence is in Summary A, while Summary B has only important information.</strong><br/>
-        Alternatively, <strong>not all information in Summary A is important, while Summary B doesn't have all the important information from the reference sentence</strong>.
         <p>You will be scoring each summary sentence by stating how strongly you agree or disagree using a slider from scale 1 (strong disagreement) to 100 (strong agreement).</p>
         <hr />
-        <h4><strong>Step 2: Sanity Check</strong></h4>
-        <p><strong>Please read the reference sentence first before assessing the summary</strong>. After you have submitted the evaluation, there will be one simple True/False question where we will verify whether you have read the reference sentence or not. <strong>Any submission that failed the True/False question will be rejected.</strong></p>
+        <h4><strong>Sanity Check</strong></h4>
+        <p>We have inserted an obviously bad and good fake summaries in between a real summaries. Any submission that failed to recognize the bad and good fake summaries and give them a suitable scores will be <strong>rejected.</strong></p>
         <hr/>
         <p>There is a <strong>code</strong> that you have to copy and paste to Amazon platform at the end of the task.</p>
 
@@ -65,5 +71,8 @@ h3 {
   padding-left: 2rem;
   padding-right: 2rem;
   padding-bottom: 2rem;
+}
+.highlight {
+  color: red;
 }
 </style>
