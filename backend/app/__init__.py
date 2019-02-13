@@ -5,7 +5,6 @@ import os
 import json
 
 from flask import Flask, render_template, make_response
-from flask_debugtoolbar import DebugToolbarExtension
 
 from backend.api.admin import admin_api
 from backend.api.user import user_api
@@ -77,7 +76,6 @@ def create_app(config, is_testing):
         with app.app_context():
             init_db(dataset_path, db)
 
-    toolbar = DebugToolbarExtension(app)
     return app
 
 
