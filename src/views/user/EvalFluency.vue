@@ -224,16 +224,19 @@ function insertSanitySumms() {
 async function getFile() {
   await axios.get(`/fluency/${this.project_id}?n=5`)
     .then((response) => {
+      // console.log(response.data);
       this.sanity_summ = response.data.sanity_summ;
       this.results = response.data.results;
       this.summaries = response.data.summaries;
       this.mturk_code = response.data.mturk_code;
     })
+    .then(() => {
+      insertSanitySumms.call(this);
+    })
     .catch(() => {
       this.showMessage('Server is busy! Please wait 3 minutes and refresh!');
     });
   console.log(this.arr);
-  await insertSanitySumms.call(this);
 }
 
 function sendResult(resultJSON) {
@@ -394,8 +397,8 @@ export default {
       return 'Click to submit';
     },
   },
-  mounted() {
-    getFile.call(this);
+  async beforeMount() {
+    await getFile.call(this);
   },
 };
 </script>
