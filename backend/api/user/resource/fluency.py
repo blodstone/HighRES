@@ -3,10 +3,10 @@ import string
 
 from flask import request
 from flask_restful import Resource, abort
-from sqlalchemy import desc
 from sqlalchemy.sql.expression import func
 
-from backend.model.project import EvaluationProject, FluencyResultSchema, FluencyResult
+from backend.model.project import EvaluationProject
+from backend.model.result import FluencyResultSchema, FluencyResult
 from backend.model.project_status import ProjectStatus
 from backend.model import ma, db
 from backend.model.summary import SummarySchema, SanitySummarySchema, Summary, SanitySummary
@@ -29,11 +29,20 @@ class FluencySchema(ma.Schema):
 
 
 class FluencyResource(Resource):
+
+    def post(self, project_id):
+        results = request.get_json()
+        for result in results:
+            result_query = FluencyResult.query.get(result['id'])
+            result_query.fluency = result['fluency']
+            result_query.clarity = result['clarity']
+            db.session.commit()
+
     def get(self, project_id):
         n = request.args.get('n')
         project = EvaluationProject.query.get(project_id)
         if not project:
-            return abort(404, message=f"Project {project_id }not found")
+            return abort(404, message=f"Project {project_id} not found")
         else:
 
             # Get unfinished project_status
@@ -54,7 +63,7 @@ class FluencyResource(Resource):
             for p in proj_statuses:
                 result = FluencyResult(
                     mturk_code=mturk_code,
-                    status_id=p.id
+                    proj_status_id=p.id
                 )
                 db.session.add(result)
                 db.session.commit()

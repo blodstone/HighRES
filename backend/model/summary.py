@@ -38,6 +38,13 @@ class SummaryGroupSchema(ma.ModelSchema):
         include_fk = True
 
 
+class SummaryGroupList(db.Model):
+    __tablename__ = 'summary_group_list'
+    id = db.Column(db.INTEGER, primary_key=True, nullable=False)
+    proj_id = db.Column(db.INTEGER, db.ForeignKey('fluency_project.id'), nullable=False)
+    summ_group_id = db.Column(db.INTEGER, db.ForeignKey('summary_group.id'), nullable=False)
+
+
 class SanitySummary(db.Model):
     """
     For sanity checking where user's submission is deemed valid

@@ -1,9 +1,12 @@
 import json
+import random
+import string
 from flask_testing import TestCase
 from backend.app import create_app
 from backend.model.dataset import Dataset, DatasetSchema
-from backend.model.project import EvaluationProject
 from backend.model.summary import SummaryGroup, SummaryGroupSchema
+from backend.model.result import FluencyResultSchema, FluencyResult
+
 
 
 class HarnessAdminTest(TestCase):
@@ -17,17 +20,13 @@ class HarnessAdminTest(TestCase):
         return app
 
     def create_proj(self):
-        dataset = DatasetSchema().dump(Dataset.query.first())
-        # dataset = '{"summ_groups": [{"summaries": [1], "dataset": 1, "is_ref": false, "name": "BBC_test_system_tconvs2s", "id": 1}, {"summaries": [2], "dataset": 1, "is_ref": false, "name": "BBC_test_system_ptgen", "id": 2}, {"summaries": [3], "dataset": 1, "is_ref": true, "name": "BBC_test_ref_gold", "id": 3}], "name": "BBC_test", "id": 1}'
-        summ_group = SummaryGroupSchema().dump(SummaryGroup.query.first())
-        # summ_group = '{"name": "BBC_test_system_ptgen", "dataset": 1, "summaries": [2], "is_ref": false, "id": 2}'
+        summ_group_list = SummaryGroupSchema().dump(SummaryGroup.query.limit(3), many=True)
         return self.client.put(f"/admin/project/evaluation",
                         data=json.dumps(dict(
                             name='Test Create',
-                            summ_group=summ_group.data,
-                            dataset=dataset.data,
+                            summ_group_list=summ_group_list.data,
                             category='Fluency',
-                            total_exp_results=1
+                            n_summaries=5
                         )
                         ),
                         content_type='application/json'
@@ -50,5 +49,25 @@ class HarnessAdminTest(TestCase):
     def test_get_fluency(self):
         self.create_proj()
         response = self.client.get(f"/fluency/1?n=5")
-        print(response.json)
+        self.assert200(response)
+        results = response.json['results']
+        self.assertEqual(len(results), 5)
+        self.assertNotEqual(len(results), 4)
+
+    def test_post_fluency(self):
+        self.create_proj()
+        response = self.client.get(f"/fluency/1?n=5")
+        results = response.json['results']
+        results_schema = FluencyResultSchema(many=True)
+        for result in results:
+            result['fluency'] = 1
+            result['clarity'] = 100
+        results_schema.dump(results)
+        response = self.client.post(f"/fluency/1",
+                                    data=json.dumps(results_schema.dump(results).data),
+                                    content_type='application/json')
+        for result in results:
+            result_query = FluencyResult.query.get(result['id'])
+            self.assertEqual(result_query.fluency, result['fluency'])
+            self.assertEqual(result_query.clarity, result['clarity'])
         self.assert200(response)

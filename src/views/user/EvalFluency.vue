@@ -57,7 +57,7 @@
                                 <label class="label is-small">Strongly <br/> disagree</label>
                             </span>
                             <span class="level-item">
-                            <vue-slider min=1 max=100 v-model="recall"
+                            <vue-slider min=1 max=100 v-model="results[page.current - 1].clarity"
                                         v-if="show" width="100%"></vue-slider>
                             </span>
                             <span class="level-right">
@@ -83,47 +83,35 @@
                                 <label class="label is-small">Strongly <br/> disagree</label>
                             </span>
                             <span class="level-item">
-                           <vue-slider min=1 max=100 v-model="precision"
+                           <vue-slider min=1 max=100 v-model="results[page.current - 1].fluency"
                                        v-if="show" width="100%"></vue-slider>
                             </span>
                             <span class="level-right">
                                 <label class="label is-small">Strongly <br/> agree</label>
                             </span>
                         </div>
-                        <p class="my-text">
-                            <b-tooltip
-                              label="Are there any datelines, system-internal
-                              formatting or capitalization errors that can make the reading
-                              of the summary difficult?">
-                                <b-icon
-                                    pack="fas"
-                                    icon="info-circle"
-                                    size="is-small">
-                                </b-icon>
-                            </b-tooltip>
-                          The summary has no noticeable <strong>formatting problem</strong>.</p>
-                        <div class="level" align="center"
-                             style="margin-bottom: 1.8rem; margin-top: 1.8rem;">
-                            <span class="level-left">
-                                <label class="label is-small">Strongly <br/> disagree</label>
-                            </span>
-                            <span class="level-item">
-                           <vue-slider min=1 max=100 v-model="precision"
-                                       v-if="show" width="100%"></vue-slider>
-                            </span>
-                            <span class="level-right">
-                                <label class="label is-small">Strongly <br/> agree</label>
-                            </span>
+                        <div class="level column-5">
+                          <div class="level-item">
+                            <button class="button is-primary" v-on:click="prev">
+                              Prev
+                            </button>
+                          </div>
+                          <div class="level-item">
+                            <strong>
+                              {{page.current}}/{{page.total}}
+                            </strong>
+                          </div>
+                          <div class="level-item">
+                            <button class="button is-primary" v-on:click="next">
+                              Next
+                            </button>
+                          </div>
                         </div>
-                        <button class="button is-primary" v-on:click="prev">
-                          Prev
-                        </button>
-                          <strong>
-                          {{page.current}}/{{page.total}}
-                          </strong>
-                        <button class="button is-primary" v-on:click="next">
-                          Next
-                        </button>
+                        <div align="center">
+                          <button class="button is-primary" v-on:click="saveEvaluation">
+                            Finish
+                          </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -132,44 +120,6 @@
         <div class="columns" :style="{ display: display.message }">
             <div class="column is-8 is-offset-2 box content">
                 <div align="center" v-html="message">
-                </div>
-            </div>
-        </div>
-      <div class="columns" :style="{ display: display.test }">
-            <div class="column is-8 is-offset-2 box content">
-                <div align="center">
-                    <h3>Please Answer the Following Question</h3>
-                    <div v-html="testPrompt">
-                    </div>
-                    <div class="block">
-                        <b-radio v-model="radio"
-                                 native-value="True">
-                            True
-                        </b-radio>
-                        <b-radio v-model="radio"
-                                 native-value="False">
-                            False
-                        </b-radio>
-                    </div>
-                    <hr/>
-                    <div :style="{ display: mTurkDisplay }">
-                        <p>
-                            Please enter an email to be included in a lucky draw
-                            or leave it blank to opt out:
-                        </p>
-                        <b-field>
-                            <b-input v-model="email"
-                                     placeholder="Your email"
-                                     icon-pack="fas"
-                                     icon="envelope" style="width: 250px;"></b-input>
-                        </b-field>
-                    </div>
-                    <div style="margin-top: 5px;">
-                        <button class="button is-primary"
-                                v-on:click="saveEvaluation">
-                            Submit
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -200,23 +150,30 @@ function insertSanitySumms() {
       this.arr.push(r);
     }
   }
+  this.arr.sort();
   this.summaries.splice(this.arr[0], 0, {
     text: this.sanity_summ.best_summary,
   });
   this.results.splice(this.arr[0], 0, {
-    test: 0,
+    clarity: 50,
+    fluency: 50,
+    type: 'best',
   });
   this.summaries.splice(this.arr[1], 0, {
     text: this.sanity_summ.avg_summary,
   });
   this.results.splice(this.arr[1], 0, {
-    test: 0,
+    clarity: 50,
+    fluency: 50,
+    type: 'avg',
   });
   this.summaries.splice(this.arr[2], 0, {
     text: this.sanity_summ.worst_summary,
   });
   this.results.splice(this.arr[2], 0, {
-    test: 0,
+    clarity: 50,
+    fluency: 50,
+    type: 'worst',
   });
   this.page.total = this.summaries.length;
 }
@@ -239,21 +196,15 @@ async function getFile() {
   console.log(this.arr);
 }
 
-function sendResult(resultJSON) {
-  axios.post('project/save_result/evaluation', resultJSON)
+function sendResult() {
+  axios.post(`fluency/${this.project_id}`, this.results)
     .then(() => {
       this.$toast.open({
         message: 'Submission successful.',
         type: 'is-success',
       });
-      let text = '';
-      if (this.is_mturk === '1') {
-        text = '<p>Please enter this code:</p>' +
-              `<blockquote>${this.turkCode}</blockquote>`;
-      } else {
-        text = '<p>Please refresh the page to do another highlighting. ' +
-          'You need to do at least twice to be eligible for the lucky draw.</p>';
-      }
+      const text = '<p>Please enter this code:</p>' +
+              `<blockquote>${this.mturk_code}</blockquote>`;
       this.showMessage(`<h3>Thank you for submitting!</h3><br/> ${text}`);
     })
     .catch((error) => {
@@ -277,6 +228,7 @@ export default {
       arr: [],
       start_time: 0,
       is_mturk: this.$route.params.mturk,
+      mturk_code: '',
       show: false,
       summaries: null,
       sanity_summ: null,
@@ -334,38 +286,19 @@ export default {
       this.display.landing = 'none';
       window.scrollTo(0, 0);
       this.show = true;
-      axios.get(`result/evaluation/${this.summ_status_id}`)
-        .then((response) => {
-          this.result_id = response.data.result_id;
-        });
       this.start_time = new Date().getTime();
     },
     saveEvaluation() {
-      const resultJSON = {
-        project_id: this.project_id,
-        status_id: this.summ_status_id,
-        precision: this.precision,
-        recall: this.recall,
-        category: 'Informativeness_Ref',
-        mturk_code: '',
-        email: this.email,
-        result_id: this.result_id,
-        opening_time: this.start_time,
-        finished_time: new Date().getTime(),
-      };
-      if (this.is_mturk === '1') {
-        resultJSON.mturk_code = this.turkCode;
-      } else {
-        resultJSON.mturk_code = null;
+      if (this.results[this.arr[2]].fluency <= this.results[this.arr[0]].fluency &&
+        this.results[this.arr[2]].fluency <= this.results[this.arr[1]].fluency) {
+        for (let i = 0; i < this.results.length; i += 1) {
+          this.results[i].validity = true;
+        }
       }
-      if (this.radio === '') {
-        resultJSON.validity = false;
-      } else if ((this.radio === 'True') === this.sanity_answer) {
-        resultJSON.validity = true;
-      } else {
-        resultJSON.validity = false;
-      }
-      sendResult.call(this, resultJSON);
+      this.results.splice(this.arr[0]);
+      this.results.splice(this.arr[1]);
+      this.results.splice(this.arr[2]);
+      sendResult.call(this);
     },
   },
   computed: {
@@ -397,8 +330,8 @@ export default {
       return 'Click to submit';
     },
   },
-  async beforeMount() {
-    await getFile.call(this);
+  beforeMount: async function onBeforeMount() {
+    getFile.call(this);
   },
 };
 </script>

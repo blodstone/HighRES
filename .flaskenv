@@ -15,7 +15,7 @@ DB_URI="mysql://root:wildanimus@localhost/harness_test"
 
 # Uncomment this to initialize dataset (document, summary and the sanity questions)
 # using data from DATASET_PATH, BE CAREFUL! All tables will be dropped! (Dump the schema first!)
-IS_INIT_DB=1
+# IS_INIT_DB=1
 DATASET_PATH='/home/acp16hh/Projects/Research/Experiments/Exp_Elly_Human_Evaluation/src/harness/dataset/BBC'
 
 
