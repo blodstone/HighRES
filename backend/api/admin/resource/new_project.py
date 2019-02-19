@@ -1,5 +1,6 @@
 import string
-from random import shuffle, random, choice
+from random import shuffle, choice
+from datetime import datetime, timedelta
 
 from flask import request
 from flask_restful import Resource, abort
@@ -32,14 +33,16 @@ class ProjectResource(Resource):
     def put(self, type):
         project = request.get_json()
         if type.lower() == ProjectType.EVALUATION.value.lower():
-            proj_id = self.create_project(project)
-            self.create_project_result(project, proj_id)
+            proj_id = self.__create_project(project)
+            self.__create_project_result(project, proj_id)
 
-    def create_project(self, project):
+    def __create_project(self, project):
         # noinspection PyArgumentList
         new_project = FluencyProject(
             name=project['name'],
-            category=project['category'])
+            category=project['category'],
+            expire_duration=project['expire_duration']
+        )
         db.session.add(new_project)
         db.session.commit()
         for summ_group in project['summ_group_list']:
@@ -61,7 +64,7 @@ class ProjectResource(Resource):
     #         db.session.add(new_summ_status)
     #         db.session.commit()
 
-    def create_project_result(self, project, proj_id):
+    def __create_project_result(self, project, proj_id):
         summ_groups = SummaryGroup.query\
             .join(SummaryGroupList)\
             .join(FluencyProject)\
@@ -94,10 +97,10 @@ class ProjectResource(Resource):
             db.session.add(new_proj_status)
             db.session.commit()
 
+            # Every results in the chunk is created in the database
             for result in chunk:
                 result.proj_status_id = new_proj_status.id
             db.session.bulk_save_objects(chunk)
             db.session.commit()
-
 
 

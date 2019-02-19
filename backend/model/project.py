@@ -24,6 +24,7 @@ class EvaluationProject(BaseProject, db.Model):
     __tablename__ = 'evaluation_project'
 
     highlight = db.Column(db.Boolean, default=True)
+    expire_duration = db.Column(db.INTEGER, nullable=False, default=3)
     # proj_statuses = db.relationship('ProjectStatus', backref='project', lazy=True)
 
 
@@ -31,3 +32,4 @@ class FluencyProject(BaseProject, db.Model):
     __tablename__ = 'fluency_project'
 
     n_summaries = db.Column(db.Integer, default=5)
+    expire_duration = db.Column(db.INTEGER, nullable=False, default=3)

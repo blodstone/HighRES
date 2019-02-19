@@ -39,6 +39,9 @@ class SummaryGroupSchema(ma.ModelSchema):
 
 
 class SummaryGroupList(db.Model):
+    """
+    N-to-N table linking project and summary group
+    """
     __tablename__ = 'summary_group_list'
     id = db.Column(db.INTEGER, primary_key=True, nullable=False)
     proj_id = db.Column(db.INTEGER, db.ForeignKey('fluency_project.id'), nullable=False)

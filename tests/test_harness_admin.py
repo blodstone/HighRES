@@ -8,7 +8,6 @@ from backend.model.summary import SummaryGroup, SummaryGroupSchema
 from backend.model.result import FluencyResultSchema, FluencyResult
 
 
-
 class HarnessAdminTest(TestCase):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "mysql://root:wildanimus@localhost/harness_test"
@@ -19,14 +18,15 @@ class HarnessAdminTest(TestCase):
         app = create_app(self, True)
         return app
 
-    def create_proj(self):
+    def __create_proj(self):
         summ_group_list = SummaryGroupSchema().dump(SummaryGroup.query.limit(3), many=True)
         return self.client.put(f"/admin/project/evaluation",
                         data=json.dumps(dict(
                             name='Test Create',
                             summ_group_list=summ_group_list.data,
                             category='Fluency',
-                            n_summaries=5
+                            n_summaries=5,
+                            expire_duration=3
                         )
                         ),
                         content_type='application/json'
@@ -43,19 +43,23 @@ class HarnessAdminTest(TestCase):
         self.assertEqual(result.data, response.json)
 
     def test_create_project(self):
-        response = self.create_proj()
+        response = self.__create_proj()
         self.assert200(response)
 
     def test_get_fluency(self):
-        self.create_proj()
-        response = self.client.get(f"/fluency/1?n=5")
+        self.__create_proj()
+        response = self.client.get(f"/fluency/1")
         self.assert200(response)
         results = response.json['results']
+        self.assertTrue('results' in response.json)
+        self.assertTrue('summaries' in response.json)
+        self.assertTrue('proj_status' in response.json)
+        self.assertTrue('sanity_summ' in response.json)
         self.assertEqual(len(results), 5)
         self.assertNotEqual(len(results), 4)
 
     def test_post_fluency(self):
-        self.create_proj()
+        self.__create_proj()
         response = self.client.get(f"/fluency/1?n=5")
         results = response.json['results']
         results_schema = FluencyResultSchema(many=True)
