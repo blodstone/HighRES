@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from backend.model import db, ma
+from backend.model.result import FluencyResult
 
 
 class ProjectStatus(db.Model):
@@ -25,6 +26,7 @@ class ProjectStatus(db.Model):
 
     eval_proj_id = db.Column(db.INTEGER, db.ForeignKey('evaluation_project.id'), nullable=True)
     fluency_proj_id = db.Column(db.INTEGER, db.ForeignKey('fluency_project.id'), nullable=True)
+    results = db.relationship('FluencyResult', cascade='delete')
     # ann_proj_id = db.Column(db.INTEGER, db.ForeignKey('annotation_project.id'), nullable=True)
 
 

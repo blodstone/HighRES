@@ -13,17 +13,26 @@ from backend.model import ma, db
 from backend.model.summary import SummarySchema, SanitySummarySchema, Summary, SanitySummary
 
 
+class ResSumObj(object):
+    def __init__(self, result, summary):
+        self.result = result
+        self.summary = summary
+
+
+class ResSumSchema(ma.Schema):
+    result = ma.Nested(FluencyResultSchema)
+    summary = ma.Nested(SummarySchema)
+
+
 class FluencyObj(object):
-    def __init__(self, results, summaries, sanity_summ, proj_status):
-        self.results = results
-        self.summaries = summaries
+    def __init__(self, res_sums, sanity_summ, proj_status):
+        self.res_sums = res_sums
         self.sanity_summ = sanity_summ
         self.proj_status = proj_status
 
 
 class FluencySchema(ma.Schema):
-    results = ma.Nested(FluencyResultSchema, many=True)
-    summaries = ma.Nested(SummarySchema, many=True)
+    res_sums = ma.Nested(ResSumSchema, many=True)
     sanity_summ = ma.Nested(SanitySummarySchema)
     proj_status = ma.Nested(ProjectStatusSchema)
 
@@ -40,7 +49,7 @@ class FluencyResource(Resource):
 
     def get(self, project_id):
         project = FluencyProject.query.get(project_id)
-        if not project:
+        if project is None:
             return abort(404, message=f"Fluency project {project_id} not found")
         else:
             # Get one unfinished project_status
@@ -54,15 +63,18 @@ class FluencyResource(Resource):
                 .filter_by(proj_status_id=proj_status.id, is_invalid=False)\
                 .all()
 
-            summary_ids = [result.summary_id for result in results]
-            summaries = Summary.query.filter(Summary.id.in_(summary_ids)).all()
+            res_sums = []
+            for result in results:
+                summary = Summary.query.get(result.summary_id)
+                res_sums.append(ResSumObj(result=result, summary=summary))
 
             # Get random sanity summaries
             # The function rand() is specific to MySql only (https://stackoverflow.com/q/60805)
             sanity_summ = SanitySummary.query.order_by(func.rand()).first()
             fluency = FluencyObj(
-                results=results, summaries=summaries,
-                sanity_summ=sanity_summ, proj_status=proj_status)
+                res_sums=res_sums,
+                sanity_summ=sanity_summ,
+                proj_status=proj_status)
             return FluencySchema().dump(fluency)
 
 

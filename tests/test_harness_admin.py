@@ -20,7 +20,7 @@ class HarnessAdminTest(TestCase):
 
     def __create_proj(self):
         summ_group_list = SummaryGroupSchema().dump(SummaryGroup.query.limit(3), many=True)
-        return self.client.put(f"/admin/project/evaluation",
+        return self.client.put(f"/admin/fluency",
                         data=json.dumps(dict(
                             name='Test Create',
                             summ_group_list=summ_group_list.data,
@@ -50,13 +50,16 @@ class HarnessAdminTest(TestCase):
         self.__create_proj()
         response = self.client.get(f"/fluency/1")
         self.assert200(response)
-        results = response.json['results']
-        self.assertTrue('results' in response.json)
-        self.assertTrue('summaries' in response.json)
+        res_sums = response.json['res_sums']
+        self.assertTrue('res_sums' in response.json)
         self.assertTrue('proj_status' in response.json)
         self.assertTrue('sanity_summ' in response.json)
-        self.assertEqual(len(results), 5)
-        self.assertNotEqual(len(results), 4)
+        self.assertEqual(len(res_sums), 5)
+        self.assertNotEqual(len(res_sums), 4)
+        response = self.client.delete(f"/admin/fluency/1")
+        self.assert200(response)
+        response = self.client.get(f"/fluency/1")
+        self.assert404(response)
 
     def test_post_fluency(self):
         self.__create_proj()

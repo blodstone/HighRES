@@ -2,6 +2,7 @@ import enum
 from datetime import datetime
 
 from backend.model import db, ma
+from backend.model.project_status import ProjectStatus
 
 
 class ProjectType(enum.Enum):
@@ -33,3 +34,6 @@ class FluencyProject(BaseProject, db.Model):
 
     n_summaries = db.Column(db.Integer, default=5)
     expire_duration = db.Column(db.INTEGER, nullable=False, default=3)
+    summary_group_lists = db.relationship('SummaryGroupList', cascade='delete')
+    proj_statuses = db.relationship('ProjectStatus', cascade='delete')
+

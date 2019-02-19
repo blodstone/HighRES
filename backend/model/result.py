@@ -11,7 +11,6 @@ class FluencyResult(db.Model):
     is_invalid = db.Column(db.Boolean, default=False)
     proj_status_id = db.Column(db.INTEGER, db.ForeignKey('project_status.id'), nullable=False)
     summary_id = db.Column(db.INTEGER, db.ForeignKey('summary.id'), nullable=False)
-    summary = db.relationship()
 
 
 class FluencyResultSchema(ma.ModelSchema):

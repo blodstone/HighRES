@@ -26,15 +26,22 @@ class DatasetsResource(Resource):
             abort(404, message='Empty datasets or summary groups!')
 
 
-class ProjectResource(Resource):
+class FluencyResource(Resource):
     """
     Resource for project
     """
-    def put(self, type):
+    def put(self):
         project = request.get_json()
-        if type.lower() == ProjectType.EVALUATION.value.lower():
-            proj_id = self.__create_project(project)
-            self.__create_project_result(project, proj_id)
+        proj_id = self.__create_project(project)
+        self.__create_project_result(project, proj_id)
+
+    def delete(self, project_id):
+        project = FluencyProject.query.get(project_id)
+        if project:
+            db.session.delete(project)
+            db.session.commit()
+        else:
+            abort(404, message=f"Project {project_id} not found")
 
     def __create_project(self, project):
         # noinspection PyArgumentList
@@ -53,16 +60,6 @@ class ProjectResource(Resource):
             db.session.add(new_summ_group_list)
             db.session.commit()
         return new_project.id
-
-    # def create_project_status(self, project, proj_id):
-    #     for system_summary_id in project['summ_group']['summaries']:
-    #         new_summ_status = ProjectStatus(
-    #             summary_id=system_summary_id,
-    #             eval_proj_id=proj_id,
-    #             total_exp_results=project['total_exp_results'],
-    #         )
-    #         db.session.add(new_summ_status)
-    #         db.session.commit()
 
     def __create_project_result(self, project, proj_id):
         summ_groups = SummaryGroup.query\
