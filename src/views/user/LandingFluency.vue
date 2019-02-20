@@ -14,11 +14,11 @@
         <blockquote>
             The summary is <strong>grammatically</strong> correct.
         </blockquote>
-        <p><strong>Explanation:</strong> There any no obviously ungrammatical sentences,
+        <p><strong>Explanation:</strong> There is no obviously ungrammatical sentences,
                                     e.g.,missing components, unrelated fragments or any other
                                     grammar-related problem that makes the
                                     text difficult to read.</p>
-        <p>An example assessment of one bad summary in each category:</p>
+        <p>An example assessment of one bad summary in each aspect:</p>
         <blockquote>
             <strong>Lack of clarity</strong><br/>
           <a class="highlight">He</a>, born 2 May 1975, is a English retired professional footballer and current President of Inter Miami CF since .

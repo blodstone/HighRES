@@ -49,7 +49,7 @@
                                     size="is-small">
                                 </b-icon>
                             </b-tooltip>
-                          The summary has a <strong>clear reference</strong>.
+                          The summary is a <strong>clear</strong>.
                         </p>
                         <div class="level" align="center"
                              style="margin-bottom: 1.8rem; margin-top: 1.8rem;">
