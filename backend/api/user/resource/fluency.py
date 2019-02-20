@@ -1,6 +1,5 @@
-import random
-import string
-from datetime import datetime
+from datetime import datetime, timedelta
+from random import shuffle
 
 from flask import request
 from flask_restful import Resource, abort
@@ -10,7 +9,8 @@ from backend.model.project import FluencyProject
 from backend.model.result import FluencyResultSchema, FluencyResult
 from backend.model.project_status import ProjectStatus, ProjectStatusSchema
 from backend.model import ma, db
-from backend.model.summary import SummarySchema, SanitySummarySchema, Summary, SanitySummary
+from backend.model.summary import SummarySchema, SanitySummarySchema, \
+    Summary, SanitySummary, SummaryGroup, SummaryGroupList
 
 
 class ResSumObj(object):
@@ -39,13 +39,32 @@ class FluencySchema(ma.Schema):
 
 class FluencyResource(Resource):
 
-    def post(self, project_id):
-        results = request.get_json()
-        for result in results:
-            result_query = FluencyResult.query.get(result['id'])
-            result_query.fluency = result['fluency']
-            result_query.clarity = result['clarity']
-            db.session.commit()
+    def post(self):
+        data = request.get_json()
+        old_results = []
+        print(data['results'])
+        for result in data['results']:
+            old_result = FluencyResult.query.get(result['id'])
+            old_result.fluency = result['fluency']
+            old_result.clarity = result['clarity']
+            old_results.append(old_result)
+        proj_status = ProjectStatus.query.get(data['proj_status']['id'])
+        proj_status.validity = data['proj_status']['validity']
+        proj_status.is_finished = data['proj_status']['is_finished']
+        proj_status.is_active = data['proj_status']['is_active']
+        if not proj_status.validity:
+            # Recreate results
+            results = []
+            for result in data['results']:
+                new_result = FluencyResult(
+                    summary_id=result['summary_id'],
+                    proj_status_id=result['proj_status_id'])
+                results.append(new_result)
+            db.session.bulk_save_objects(results)
+            # Invalidate old results
+            for old_result in old_results:
+                old_result.is_invalid = True
+        db.session.commit()
 
     def get(self, project_id):
         project = FluencyProject.query.get(project_id)
@@ -75,6 +94,11 @@ class FluencyResource(Resource):
                 res_sums=res_sums,
                 sanity_summ=sanity_summ,
                 proj_status=proj_status)
+
+            # Change project status attribute before sending
+            proj_status.is_active = True
+            proj_status.expired_in = datetime.utcnow() + timedelta(minutes=project.expire_duration)
+            db.session.commit()
             return FluencySchema().dump(fluency)
 
 

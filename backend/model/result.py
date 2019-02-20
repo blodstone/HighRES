@@ -16,3 +16,4 @@ class FluencyResult(db.Model):
 class FluencyResultSchema(ma.ModelSchema):
     class Meta:
         model = FluencyResult
+        include_fk = True

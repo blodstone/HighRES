@@ -16,7 +16,7 @@
                         <h1 align="center">Please don't refresh the page.</h1>
                         <hr>
                         <h5 class="my-header">Assess the following summary.</h5>
-                          <div v-if="summaries">
+                          <div v-if="res_sums">
                             <p class="my-summary">
                               {{ summaryText }}
                             </p>
@@ -57,7 +57,8 @@
                                 <label class="label is-small">Strongly <br/> disagree</label>
                             </span>
                             <span class="level-item">
-                            <vue-slider min=1 max=100 v-model="results[page.current - 1].clarity"
+                            <vue-slider :min=1 :max=100
+                                        v-model="res_sums[page.current - 1].result.clarity"
                                         v-if="show" width="100%"></vue-slider>
                             </span>
                             <span class="level-right">
@@ -83,7 +84,8 @@
                                 <label class="label is-small">Strongly <br/> disagree</label>
                             </span>
                             <span class="level-item">
-                           <vue-slider min=1 max=100 v-model="results[page.current - 1].fluency"
+                           <vue-slider :min=1 :max=100
+                                       v-model="res_sums[page.current - 1].result.fluency"
                                        v-if="show" width="100%"></vue-slider>
                             </span>
                             <span class="level-right">
@@ -145,47 +147,51 @@ window.onbeforeunload = () => 'Are you sure you want leave?';
 function insertSanitySumms() {
   let r = 0;
   while (this.arr.length < 3) {
-    r = Math.floor(Math.random() * this.summaries.length) + 1;
+    r = Math.floor(Math.random() * this.res_sums.length) + 1;
     if (this.arr.indexOf(r) === -1) {
       this.arr.push(r);
     }
   }
   this.arr.sort();
-  this.summaries.splice(this.arr[0], 0, {
-    text: this.sanity_summ.best_summary,
+  this.res_sums.splice(this.arr[0], 0, {
+    result: {
+      clarity: 50,
+      fluency: 50,
+      type: 'best',
+    },
+    summary: {
+      text: this.sanity_summ.best_summary,
+    },
   });
-  this.results.splice(this.arr[0], 0, {
-    clarity: 50,
-    fluency: 50,
-    type: 'best',
+  this.res_sums.splice(this.arr[1], 0, {
+    result: {
+      clarity: 50,
+      fluency: 50,
+      type: 'avg',
+    },
+    summary: {
+      text: this.sanity_summ.avg_summary,
+    },
   });
-  this.summaries.splice(this.arr[1], 0, {
-    text: this.sanity_summ.avg_summary,
+  this.res_sums.splice(this.arr[2], 0, {
+    result: {
+      clarity: 50,
+      fluency: 50,
+      type: 'worst',
+    },
+    summary: {
+      text: this.sanity_summ.worst_summary,
+    },
   });
-  this.results.splice(this.arr[1], 0, {
-    clarity: 50,
-    fluency: 50,
-    type: 'avg',
-  });
-  this.summaries.splice(this.arr[2], 0, {
-    text: this.sanity_summ.worst_summary,
-  });
-  this.results.splice(this.arr[2], 0, {
-    clarity: 50,
-    fluency: 50,
-    type: 'worst',
-  });
-  this.page.total = this.summaries.length;
+  this.page.total = this.res_sums.length;
 }
 
 async function getFile() {
-  await axios.get(`/fluency/${this.project_id}?n=5`)
+  await axios.get(`/fluency/${this.project_id}`)
     .then((response) => {
-      // console.log(response.data);
       this.sanity_summ = response.data.sanity_summ;
-      this.results = response.data.results;
-      this.summaries = response.data.summaries;
-      this.mturk_code = response.data.mturk_code;
+      this.res_sums = response.data.res_sums;
+      this.proj_status = response.data.proj_status;
     })
     .then(() => {
       insertSanitySumms.call(this);
@@ -193,18 +199,24 @@ async function getFile() {
     .catch(() => {
       this.showMessage('Server is busy! Please wait 3 minutes and refresh!');
     });
-  console.log(this.arr);
 }
 
 function sendResult() {
-  axios.post(`fluency/${this.project_id}`, this.results)
+  const results = [];
+  for (let i = 0; i < this.res_sums.length; i += 1) {
+    results.push(this.res_sums[i].result);
+  }
+  axios.post('fluency', {
+    results,
+    proj_status: this.proj_status,
+  })
     .then(() => {
       this.$toast.open({
         message: 'Submission successful.',
         type: 'is-success',
       });
       const text = '<p>Please enter this code:</p>' +
-              `<blockquote>${this.mturk_code}</blockquote>`;
+              `<blockquote>${this.proj_status.mturk_code}</blockquote>`;
       this.showMessage(`<h3>Thank you for submitting!</h3><br/> ${text}`);
     })
     .catch((error) => {
@@ -225,14 +237,14 @@ export default {
   },
   data() {
     return {
+      max: 100,
+      min: 1,
       arr: [],
       start_time: 0,
-      is_mturk: this.$route.params.mturk,
-      mturk_code: '',
       show: false,
-      summaries: null,
+      res_sums: null,
+      proj_status: null,
       sanity_summ: null,
-      results: null,
       page: {
         current: 1,
         total: 0,
@@ -243,8 +255,6 @@ export default {
         isRunning: true,
         timer: null,
       },
-      precision: 50,
-      recall: 50,
       project_id: this.$route.params.project_id,
       display: {
         content: 'none',
@@ -289,21 +299,24 @@ export default {
       this.start_time = new Date().getTime();
     },
     saveEvaluation() {
-      if (this.results[this.arr[2]].fluency <= this.results[this.arr[0]].fluency &&
-        this.results[this.arr[2]].fluency <= this.results[this.arr[1]].fluency) {
-        for (let i = 0; i < this.results.length; i += 1) {
-          this.results[i].validity = true;
-        }
+      if (this.res_sums[this.arr[2]].result.fluency <
+        this.res_sums[this.arr[0]].result.fluency &&
+        this.res_sums[this.arr[2]].result.fluency <
+        this.res_sums[this.arr[1]].result.fluency) {
+        this.proj_status.validity = true;
+        this.proj_status.finished = true;
       }
-      this.results.splice(this.arr[0]);
-      this.results.splice(this.arr[1]);
-      this.results.splice(this.arr[2]);
+      this.proj_status.finished = false;
+      this.proj_status.is_active = false;
+      this.res_sums.splice(this.arr[2], 1);
+      this.res_sums.splice(this.arr[1], 1);
+      this.res_sums.splice(this.arr[0], 1);
       sendResult.call(this);
     },
   },
   computed: {
     summaryText() {
-      return this.summaries[this.page.current - 1].text;
+      return this.res_sums[this.page.current - 1].summary.text;
     },
     testPrompt() {
       const prompt = 'Is the statement below according to the reference sentence is True or False?';

@@ -31,9 +31,9 @@ class FluencyResource(Resource):
     Resource for project
     """
     def put(self):
-        project = request.get_json()
-        proj_id = self.__create_project(project)
-        self.__create_project_result(project, proj_id)
+        project_json = request.get_json()
+        project = self.__create_project(project_json)
+        self.__create_project_result(project)
 
     def delete(self, project_id):
         project = FluencyProject.query.get(project_id)
@@ -43,61 +43,65 @@ class FluencyResource(Resource):
         else:
             abort(404, message=f"Project {project_id} not found")
 
-    def __create_project(self, project):
+    def __create_project(self, project_json):
         # noinspection PyArgumentList
         new_project = FluencyProject(
-            name=project['name'],
-            category=project['category'],
-            expire_duration=project['expire_duration']
+            name=project_json['name'],
+            category=project_json['category'],
+            expire_duration=project_json['expire_duration'],
+            total_exp_results=project_json['total_exp_results']
         )
         db.session.add(new_project)
         db.session.commit()
-        for summ_group in project['summ_group_list']:
+        summ_group_lists = []
+        for summ_group in project_json['summ_group_list']:
             new_summ_group_list = SummaryGroupList(
                 summ_group_id=summ_group['id'],
                 proj_id=new_project.id
             )
-            db.session.add(new_summ_group_list)
-            db.session.commit()
-        return new_project.id
+            summ_group_lists.append(new_summ_group_list)
+        db.session.bulk_save_objects(summ_group_lists)
+        db.session.commit()
+        return new_project
 
-    def __create_project_result(self, project, proj_id):
+    def __create_project_result(self, project):
         summ_groups = SummaryGroup.query\
             .join(SummaryGroupList)\
             .join(FluencyProject)\
-            .filter_by(id=proj_id).all()
-        # Create results
-        results = []
-        for summ_group in summ_groups:
-            for summary in summ_group.summaries:
-                results.append(FluencyResult(summary_id=summary.id, proj_status_id=0))
-        shuffle(results)
+            .filter_by(id=project.id).all()
 
-        def chunks(l, n):
-            """Yield successive n-sized chunks from l."""
-            for i in range(0, len(l), n):
-                yield l[i:i + n]
+        for i in range(project.total_exp_results):
+            # Create results
+            results = []
+            for summ_group in summ_groups:
+                for summary in summ_group.summaries:
+                    results.append(FluencyResult(summary_id=summary.id, proj_status_id=0))
+            shuffle(results)
 
-        # Create proj status
-        result_chunks = list(chunks(results, project['n_summaries']))
-        for chunk in result_chunks:
-            # Pre-generated all the random mturk_code
-            randomwords = lambda n: ''.join(
-                choice(string.ascii_lowercase) for _ in range(n))
-            mturk_code = f"{randomwords(8)}_{proj_id}"
+            def chunks(l, n):
+                """Yield successive n-sized chunks from l."""
+                for i in range(0, len(l), n):
+                    yield l[i:i + n]
 
-            # For each chunk assign a project status
-            new_proj_status = ProjectStatus(
-                mturk_code=mturk_code,
-                fluency_proj_id=proj_id,
-            )
-            db.session.add(new_proj_status)
-            db.session.commit()
+            # Create proj status
+            result_chunks = list(chunks(results, project.n_summaries))
+            for chunk in result_chunks:
+                # Pre-generated all the random mturk_code
+                randomwords = lambda n: ''.join(
+                    choice(string.ascii_lowercase) for _ in range(n))
+                mturk_code = f"{randomwords(8)}_{project.id}"
 
-            # Every results in the chunk is created in the database
-            for result in chunk:
-                result.proj_status_id = new_proj_status.id
-            db.session.bulk_save_objects(chunk)
-            db.session.commit()
+                # For each chunk assign a project status
+                new_proj_status = ProjectStatus(
+                    mturk_code=mturk_code,
+                    fluency_proj_id=project.id,
+                )
+                db.session.add(new_proj_status)
+                db.session.commit()
+                # Every results in the chunk is created in the database
+                for result in chunk:
+                    result.proj_status_id = new_proj_status.id
+                db.session.bulk_save_objects(chunk)
+                db.session.commit()
 
 
