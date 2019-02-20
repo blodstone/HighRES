@@ -40,7 +40,7 @@
                         <p class="my-text">
                             <b-tooltip
                                     label="How much trouble did you have identifying
-                                    the referents of nounphrases in this summary?
+                                    the referents of noun phrases in this summary?
                                     Are there nouns, pronouns or personal names that are
                                     not well-specified?">
                                 <b-icon
