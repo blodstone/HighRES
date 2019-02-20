@@ -95,6 +95,7 @@ def init_db(dataset_path, db):
     db.session.commit()
 
     # Insert documents
+    documents = []
     for file in os.listdir(documents_path):
         file_path = os.path.join(documents_path, file)
         sanity_file_path = os.path.join(sanity_path, f"{file.split('.')[0]}.json")
@@ -105,7 +106,7 @@ def init_db(dataset_path, db):
             json_result = json.load(infile)
             sanity_json = json.load(sanity)
             sanity_2_json = json.load(sanity_2)
-            document = Document(
+            documents.append(Document(
                 dataset_id=dataset.id,
                 doc_id=json_result['doc_id'],
                 doc_json=json_result,
@@ -113,13 +114,15 @@ def init_db(dataset_path, db):
                 sanity_answer=sanity_json['answer'],
                 sanity_statement_2=sanity_2_json['statement'],
                 sanity_answer_2=sanity_2_json['answer'],
-            )
-            db.session.add(document)
-            db.session.commit()
+            ))
             sanity.close()
             sanity_2.close()
+    db.session.bulk_save_objects(documents)
+    db.session.commit()
+
 
     # Insert Summaries
+    summaries = []
     for folder in os.listdir(summaries_path):
         if folder.startswith('ref'):
             summary_group = SummaryGroup(name='%s_ref_%s' % (dataset_name, folder[4:]),
@@ -135,27 +138,29 @@ def init_db(dataset_path, db):
         for file in os.listdir(ref_path):
             with open(os.path.join(ref_path, file), 'r') as infile:
                 text = ' '.join(infile.readlines()).strip()
-                document = db.session.query(Document).filter_by(doc_id=os.path.splitext(file)[0]).first()
-                summary = Summary(
+                document = db.session.query(Document)\
+                    .filter_by(doc_id=os.path.splitext(file)[0]).first()
+                summaries.append(Summary(
                     doc_id=document.id,
                     text=text,
                     summary_group_id=summary_group.id
-                )
-                db.session.add(summary)
-                db.session.commit()
+                ))
+    db.session.bulk_save_objects(summaries)
+    db.session.commit()
 
     # Insert sanity summaries
+    sanity_summaries = []
     for file in os.listdir(sanity_summ_path):
         file_path = os.path.join(sanity_summ_path, file)
         with open(file_path, 'r') as infile:
             json_infile = json.load(infile)
-            sanity_summary = SanitySummary(
+            sanity_summaries.append(SanitySummary(
                 best_summary=json_infile['best'].lower(),
                 avg_summary=json_infile['average'].lower(),
                 worst_summary=json_infile['worst'].lower(),
                 dataset_id=dataset.id
-            )
-            db.session.add(sanity_summary)
-            db.session.commit()
+            ))
+    db.session.bulk_save_objects(sanity_summaries)
+    db.session.commit()
 
 

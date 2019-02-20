@@ -20,8 +20,8 @@
             </b-select>
         </b-field>
         <b-field horizontal label="Summary Group" v-if="project.dataset">
-            <b-select placeholder="Select a summary group" v-model="project.summ_group"
-                      icon="file" icon-pack="fas">
+            <b-select multiple native-size="3"
+                      placeholder="Select one or more group" v-model="project.summ_group_list">
                 <option v-for="x in project.dataset.summ_groups"
                         :value="x" :key="x.name">{{ x.name }}</option>
             </b-select>
@@ -30,6 +30,16 @@
         <b-field horizontal label="# of evaluation" message="Number of evaluation per document">
             <b-input name="total_exp_results"
                      v-model.number="project.total_exp_results" type="number"></b-input>
+        </b-field>
+        <b-field horizontal label="Expire Duration (in min)"
+                 message="The time the task has to be finished.">
+            <b-input name="expire_duration"
+                     v-model.number="project.expire_duration" type="number"></b-input>
+        </b-field>
+        <b-field horizontal label="# Summaries"
+                 message="Number of summaries to be shown at once.">
+            <b-input name="n_summaries"
+                     v-model.number="project.n_summaries" type="number"></b-input>
         </b-field>
         <button class="button is-primary" v-on:click="createProject">Create Project</button>
     </div>
@@ -46,15 +56,17 @@ export default {
       project: {
         name: '',
         dataset: null,
-        summ_group: null,
+        summ_group_list: null,
         category: null,
+        n_summaries: 5,
         total_exp_results: 1,
+        expire_duration: 3,
       },
     };
   },
   methods: {
     createProject() {
-      axios.put('admin/project/evaluation', this.project)
+      axios.put('admin/fluency', this.project)
         .then(() => {
           this.$toast.open({
             message: 'Project created!',

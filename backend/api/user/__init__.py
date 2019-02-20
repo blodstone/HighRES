@@ -9,7 +9,7 @@ user_api = Blueprint('user_api', __name__, static_folder='../../../instance/dist
 user_api.config = {}
 api = Api()
 api.init_app(user_api)
-api.add_resource(FluencyResource, '/fluency/<int:project_id>')
+api.add_resource(FluencyResource, '/fluency', '/fluency/<int:project_id>')
 
 @user_api.record
 def record_params(setup_state):
