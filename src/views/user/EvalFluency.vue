@@ -39,10 +39,10 @@
                         </p>
                         <p class="my-text">
                             <b-tooltip
-                                    label="How much trouble did you have identifying
-                                    the referents of noun phrases in this summary?
-                                    Are there nouns, pronouns or personal names that are
-                                    not well-specified?">
+                                    label="There should be no difficulties in
+                                    identifying the referents of the noun phrases
+                                    (every noun/place/event should be well-specified)
+                                    or understanding the meaning of the sentence.">
                                 <b-icon
                                     pack="fas"
                                     icon="info-circle"
@@ -67,17 +67,16 @@
                         </div>
                         <p class="my-text">
                             <b-tooltip
-                                    label="Are there any obviously ungrammatical sentences,
-                                    e.g.,missing components, unrelated fragments or any other
-                                    grammar-related problem that makes the
-                                    text difficult to read? ">
+                                    label="The summary should sound natural
+                                    and has no grammar-related problem that
+                                    makes the text difficult to read. ">
                                 <b-icon
                                     pack="fas"
                                     icon="info-circle"
                                     size="is-small">
                                 </b-icon>
                             </b-tooltip>
-                            The summary is <strong>grammatically</strong> correct.</p>
+                            The summary is <strong>fluent</strong>.</p>
                         <div class="level" align="center"
                              style="margin-bottom: 1.8rem; margin-top: 1.8rem;">
                             <span class="level-left">
