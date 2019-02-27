@@ -20,7 +20,8 @@
                     <!--<b-table-column field="dataset_name" label="Dataset">-->
                         <!--{{ props.row.dataset_name }}-->
                     <!--</b-table-column>-->
-                    <!--<b-table-column field="summ_group_name" label="Summary Group" width="100">-->
+                    <!--<b-table-column field="summ_group_name"
+                    label="Summary Group" width="100">-->
                         <!--{{ props.row.summ_group_name }}-->
                     <!--</b-table-column>-->
                     <!--<b-table-column field="created_at"-->
