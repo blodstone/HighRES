@@ -78,10 +78,16 @@ class FluencyResource(Resource):
             # Get one unfinished project_status
             current_time = datetime.utcnow()
             proj_status = ProjectStatus.query\
-                .filter_by(fluency_proj_id=project.id, is_finished=False)\
-                .filter(ProjectStatus.expired_in < current_time)\
+                .filter_by(fluency_proj_id=project.id,
+                           is_finished=False, is_active=False)\
                 .order_by(func.rand())\
                 .first()
+            if proj_status is None:
+                proj_status = ProjectStatus.query \
+                    .filter_by(fluency_proj_id=project.id, is_finished=False)\
+                    .filter(ProjectStatus.expired_in < current_time)\
+                    .order_by(func.rand())\
+                    .first()
             if proj_status is None:
                 return abort(404, message=f"No project status is opened.")
             # Get related results
