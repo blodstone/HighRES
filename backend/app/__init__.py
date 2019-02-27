@@ -53,7 +53,9 @@ def create_app(config, is_testing):
         SECRET_KEY=os.getenv('SECRET_KEY'),
         SQLALCHEMY_DATABASE_URI=db_uri,
         SQLALCHEMY_TRACK_MODIFICATIONS=True,
-        DEBUG_TB_PROFILER_ENABLED=True
+        DEBUG_TB_PROFILER_ENABLED=True,
+        SQLALCHEMY_POOL_RECYCLE=299,
+        SQLALCHEMY_POOL_TIMEOUT=20
     )
     db.init_app(app)
     ma.init_app(app)
