@@ -10,7 +10,7 @@ from backend.model.project_status import ProjectStatus
 
 class HarnessAdminTest(TestCase):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = "mysql://root:wildanimus@localhost/harness_test"
+    SQLALCHEMY_DATABASE_URI = "mysql://root:wildanimus@localhost/harness"
     IS_INIT_DB = 1
     DATASET_PATH = '/home/acp16hh/Projects/Research/Experiments/Exp_Elly_Human_Evaluation/src/harness/dataset/BBC'
 
