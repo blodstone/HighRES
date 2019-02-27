@@ -37,3 +37,7 @@ class FluencyProject(BaseProject, db.Model):
     summary_group_lists = db.relationship('SummaryGroupList', cascade='delete')
     proj_statuses = db.relationship('ProjectStatus', cascade='delete')
 
+
+class FluencyProjectSchema(ma.ModelSchema):
+    class Meta:
+        model = FluencyProject

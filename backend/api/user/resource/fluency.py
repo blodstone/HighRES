@@ -42,7 +42,7 @@ class FluencyResource(Resource):
     def post(self):
         data = request.get_json()
         old_results = []
-        print(data['results'])
+        # print(data['results'])
         for result in data['results']:
             old_result = FluencyResult.query.get(result['id'])
             old_result.fluency = result['fluency']

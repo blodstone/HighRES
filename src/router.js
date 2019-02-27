@@ -5,6 +5,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './components/admin/Home.vue';
 import Admin from './views/admin/Admin.vue';
+import ManageProject from './views/admin/ManageProject.vue';
 import NewProject from './components/admin/ProjectMenu/NewProject.vue';
 import NewEvaluation from './components/admin/ProjectMenu/NewEvaluation.vue';
 import EvalFluency from './views/user/EvalFluency.vue';
@@ -31,6 +32,11 @@ export default new Router({
           path: '',
           name: 'admin',
           component: Home,
+        },
+        {
+          path: 'manage',
+          name: 'manage',
+          component: ManageProject,
         },
         {
           path: 'new',

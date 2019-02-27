@@ -1,16 +1,15 @@
 import string
 from random import shuffle, choice
-from datetime import datetime, timedelta
 
 from flask import request
 from flask_restful import Resource, abort
 
 from backend.model.dataset import Dataset, DatasetSchema
-from backend.model.project import ProjectType, FluencyProject
+from backend.model.project import FluencyProject
 from backend.model.project_status import ProjectStatus
 from backend.model.result import FluencyResult
 from backend.model.summary import SummaryGroupList, SummaryGroup
-from backend.model import db, ma
+from backend.model import db
 
 
 class DatasetsResource(Resource):

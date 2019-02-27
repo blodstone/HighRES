@@ -1,6 +1,5 @@
 import json
-import random
-import string
+from joblib import Parallel, delayed
 from flask_testing import TestCase
 from backend.app import create_app
 from backend.model.dataset import Dataset, DatasetSchema
@@ -11,7 +10,7 @@ from backend.model.project_status import ProjectStatus
 
 class HarnessAdminTest(TestCase):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = "mysql://root:wildanimus@localhost/harness_test"
+    SQLALCHEMY_DATABASE_URI = "mysql://root:wildanimus@localhost/harness"
     IS_INIT_DB = 1
     DATASET_PATH = '/home/acp16hh/Projects/Research/Experiments/Exp_Elly_Human_Evaluation/src/harness/dataset/BBC'
 
@@ -37,6 +36,15 @@ class HarnessAdminTest(TestCase):
     def test_setup(self):
         self.assertTrue(self.app is not None)
 
+    def test_manage_proj_UI(self):
+        response = self.__create_proj()
+        self.assert200(response)
+        response = self.client.get('/admin/fluencylist')
+        self.assert200(response)
+        print(response.json)
+        response = self.client.delete(f"/admin/fluency/1")
+        self.assert200(response)
+
     def test_get_dataset(self):
         response = self.client.get('/admin/dataset')
         result = DatasetSchema(many=True, only=('id', 'name', 'summ_groups'))\
@@ -47,6 +55,34 @@ class HarnessAdminTest(TestCase):
     def test_create_project(self):
         response = self.__create_proj()
         self.assert200(response)
+
+    def test_post_multiple_fluency(self):
+        # self.client.delete(f"/admin/fluency/1")
+        # self.__create_proj()
+        def post():
+            response = self.client.get(f"/fluency/2")
+            # Edit the results
+            res_sums = response.json['res_sums']
+            results = [res_sum['result'] for res_sum in res_sums]
+            for result in results:
+                result['fluency'] = 1
+                result['clarity'] = 100
+            # Edit the proj status
+            proj_status = response.json['proj_status']
+            proj_status['validity'] = True
+            proj_status['is_finished'] = True
+            proj_status['is_active'] = False
+
+            response = self.client.post(f"/fluency",
+                                        data=json.dumps({
+                                            'results': results,
+                                            'proj_status': proj_status
+                                        }),
+                                        content_type='application/json')
+            self.assert200(response)
+        for i in range(1, 61):
+            post()
+
 
     def test_get_fluency(self):
         self.__create_proj()
