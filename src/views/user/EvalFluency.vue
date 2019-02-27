@@ -306,6 +306,7 @@ export default {
       this.proj_status.best_summ_score = this.res_sums[this.arr[0]].result.fluency;
       this.proj_status.mediocre_summ_score = this.res_sums[this.arr[1]].result.fluency;
       this.proj_status.worst_summ_score = this.res_sums[this.arr[2]].result.fluency;
+      this.proj_status.is_finished = false;
       if (this.res_sums[this.arr[2]].result.fluency <
         this.res_sums[this.arr[0]].result.fluency &&
         this.res_sums[this.arr[2]].result.fluency <
@@ -313,7 +314,6 @@ export default {
         this.proj_status.validity = true;
         this.proj_status.is_finished = true;
       }
-      this.proj_status.is_finished = false;
       this.proj_status.is_active = false;
       this.proj_status.sanity_summ_id = this.sanity_summ.id;
       this.res_sums.splice(this.arr[2], 1);
