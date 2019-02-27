@@ -52,6 +52,10 @@ class FluencyResource(Resource):
         proj_status.validity = data['proj_status']['validity']
         proj_status.is_finished = data['proj_status']['is_finished']
         proj_status.is_active = data['proj_status']['is_active']
+        proj_status.best_summ_score = data['proj_status']['best_summ_score']
+        proj_status.mediocre_summ_score = data['proj_status']['mediocre_summ_score']
+        proj_status.worst_summ_score = data['proj_status']['worst_summ_score']
+        proj_status.sanity_summ_id = data['proj_status']['sanity_summ_id']
         if not proj_status.validity:
             # Recreate results
             results = []
@@ -72,11 +76,14 @@ class FluencyResource(Resource):
             return abort(404, message=f"Fluency project {project_id} not found")
         else:
             # Get one unfinished project_status
+            current_time = datetime.utcnow()
             proj_status = ProjectStatus.query\
-                .filter_by(fluency_proj_id=project.id, is_finished=False, is_active=False)\
+                .filter_by(fluency_proj_id=project.id, is_finished=False)\
+                .filter(ProjectStatus.expired_in < current_time)\
                 .order_by(func.rand())\
                 .first()
-
+            if proj_status is None:
+                return abort(404, message=f"No project status is opened.")
             # Get related results
             results = FluencyResult.query\
                 .filter_by(proj_status_id=proj_status.id, is_invalid=False)\
