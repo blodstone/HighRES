@@ -5,9 +5,12 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './components/admin/Home.vue';
 import Admin from './views/admin/Admin.vue';
+import Login from './views/admin/Login.vue';
+import ManageProject from './views/admin/ManageProject.vue';
 import NewProject from './components/admin/ProjectMenu/NewProject.vue';
 import NewEvaluation from './components/admin/ProjectMenu/NewEvaluation.vue';
 import EvalFluency from './views/user/EvalFluency.vue';
+import store from './store';
 
 Vue.use(Router);
 export default new Router({
@@ -33,6 +36,11 @@ export default new Router({
           component: Home,
         },
         {
+          path: 'manage',
+          name: 'manage',
+          component: ManageProject,
+        },
+        {
           path: 'new',
           component: NewProject,
           children: [
@@ -49,6 +57,25 @@ export default new Router({
           ],
         },
       ],
+      beforeEnter(to, from, next) {
+        if (!store.getters.isAuthenticated) {
+          next('/login');
+        } else {
+          next();
+        }
+      },
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login,
+      beforeEnter(to, from, next) {
+        if (store.getters.isAuthenticated) {
+          next('/admin');
+        } else {
+          next();
+        }
+      },
     },
   ],
 });

@@ -12,6 +12,7 @@ from backend.model import db, ma
 from backend.model.dataset import Dataset
 from backend.model.document import Document
 from backend.model.summary import Summary, SummaryGroup, SanitySummary
+from backend.model.user import User
 
 
 class CustomFlask(Flask):
@@ -88,6 +89,11 @@ def init_db(dataset_path, db):
     sanity_path = os.path.join(dataset_path, 'sanity')
     sanity_2_path = os.path.join(dataset_path, 'sanity_2')
     sanity_summ_path = os.path.join(dataset_path, 'sanity_summary')
+
+    # Insert User
+    user = User(email='admin@localhost', password='localhost')
+    db.session.add(user)
+    db.session.commit()
 
     # Insert dataset
     dataset = Dataset(name=dataset_name)
