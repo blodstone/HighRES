@@ -9,7 +9,7 @@
                 </div>
             </div>
         </div>
-        <div class="columns" :style="{ display: display.content }">
+        <div class="columns" :style="{ display: display.content }" v-if="res_sums">
             <div class="column is-8 is-offset-2 box content">
                 <div class="box summary">
                     <div class="content">
@@ -93,7 +93,8 @@
                         </div>
                         <div class="level column-5">
                           <div class="level-item">
-                            <button class="button is-primary" v-on:click="prev">
+                            <button class="button is-primary"
+                                    v-on:click="prev" :disabled="page.current === 1">
                               Prev
                             </button>
                           </div>
@@ -103,13 +104,17 @@
                             </strong>
                           </div>
                           <div class="level-item">
-                            <button class="button is-primary" v-on:click="next">
+                            <button class="button is-primary"
+                                    v-on:click="next"
+                                    :disabled="page.current === res_sums.length">
                               Next
                             </button>
                           </div>
                         </div>
                         <div align="center">
-                          <button class="button is-primary" v-on:click="saveEvaluation">
+                          <button class="button is-primary"
+                                  v-on:click="saveEvaluation"
+                                  :disabled="finish_enabled">
                             Finish
                           </button>
                         </div>
@@ -136,10 +141,7 @@ import BTooltip from 'buefy/src/components/tooltip/Tooltip.vue';
 import BIcon from 'buefy/src/components/icon/Icon.vue';
 import vueSlider from 'vue-slider-component';
 
-
 const axios = require('axios');
-
-const waitTimeForButton = 30;
 
 window.onbeforeunload = () => 'Are you sure you want leave?';
 
@@ -244,6 +246,7 @@ export default {
       res_sums: null,
       proj_status: null,
       sanity_summ: null,
+      finish_enabled: false,
       page: {
         current: 1,
         total: 0,
@@ -275,6 +278,8 @@ export default {
     next() {
       if (this.page.current !== this.page.total) {
         this.page.current += 1;
+      } else {
+        this.finish_enabled = true;
       }
     },
     showTest() {
@@ -298,6 +303,9 @@ export default {
       this.start_time = new Date().getTime();
     },
     saveEvaluation() {
+      this.proj_status.best_summ_score = this.res_sums[this.arr[0]].result.fluency;
+      this.proj_status.mediocre_summ_score = this.res_sums[this.arr[1]].result.fluency;
+      this.proj_status.worst_summ_score = this.res_sums[this.arr[2]].result.fluency;
       if (this.res_sums[this.arr[2]].result.fluency <
         this.res_sums[this.arr[0]].result.fluency &&
         this.res_sums[this.arr[2]].result.fluency <
@@ -307,15 +315,21 @@ export default {
       }
       this.proj_status.finished = false;
       this.proj_status.is_active = false;
+      this.proj_status.sanity_summ_id = this.sanity_summ.id;
       this.res_sums.splice(this.arr[2], 1);
       this.res_sums.splice(this.arr[1], 1);
       this.res_sums.splice(this.arr[0], 1);
+      this.page.current = 1;
+      this.page.total = this.res_sums.length;
       sendResult.call(this);
     },
   },
   computed: {
     summaryText() {
-      return this.res_sums[this.page.current - 1].summary.text;
+      let summ = this.res_sums[this.page.current - 1].summary.text;
+      summ = summ.replace('-lrb-', '(');
+      summ = summ.replace('-rrb-', ')');
+      return summ;
     },
     testPrompt() {
       const prompt = 'Is the statement below according to the reference sentence is True or False?';
@@ -329,17 +343,6 @@ export default {
         return 'block';
       }
       return 'none';
-    },
-    timenow() {
-      if (this.timer.isRunning === true) {
-        if ((this.timer.now - this.timer.date) < waitTimeForButton) {
-          return `Wait ${waitTimeForButton - (this.timer.now - this.timer.date)} seconds`;
-        }
-        // eslint-disable-next-line
-        this.timer.isRunning = false;
-        window.clearInterval(this.timer.timer);
-      }
-      return 'Click to submit';
     },
   },
   beforeMount: async function onBeforeMount() {
