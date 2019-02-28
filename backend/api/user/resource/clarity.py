@@ -5,12 +5,12 @@ from flask import request
 from flask_restful import Resource, abort
 from sqlalchemy.sql.expression import func
 
-from backend.model.project import FluencyProject
-from backend.model.result import FluencyResultSchema, FluencyResult
+from backend.model.project import ClarityProject
+from backend.model.result import ClarityResultSchema, ClarityResult
 from backend.model.project_status import ProjectStatus, ProjectStatusSchema
 from backend.model import ma, db
 from backend.model.summary import SummarySchema, SanitySummarySchema, \
-    Summary, SanitySummary, SummaryGroup, SummaryGroupList
+    Summary, SanitySummary
 
 
 class ResSumObj(object):
@@ -20,32 +20,32 @@ class ResSumObj(object):
 
 
 class ResSumSchema(ma.Schema):
-    result = ma.Nested(FluencyResultSchema)
+    result = ma.Nested(ClarityResultSchema)
     summary = ma.Nested(SummarySchema)
 
 
-class FluencyObj(object):
+class ClarityObj(object):
     def __init__(self, res_sums, sanity_summ, proj_status):
         self.res_sums = res_sums
         self.sanity_summ = sanity_summ
         self.proj_status = proj_status
 
 
-class FluencySchema(ma.Schema):
+class ClaritySchema(ma.Schema):
     res_sums = ma.Nested(ResSumSchema, many=True)
     sanity_summ = ma.Nested(SanitySummarySchema)
     proj_status = ma.Nested(ProjectStatusSchema)
 
 
-class FluencyResource(Resource):
+class ClarityResource(Resource):
 
     def post(self):
         data = request.get_json()
         old_results = []
         # print(data['results'])
         for result in data['results']:
-            old_result = FluencyResult.query.get(result['id'])
-            old_result.fluency = result['fluency']
+            old_result = ClarityResult.query.get(result['id'])
+            old_result.clarity = result['clarity']
             old_results.append(old_result)
         proj_status = ProjectStatus.query.get(data['proj_status']['id'])
         proj_status.validity = data['proj_status']['validity']
@@ -59,7 +59,7 @@ class FluencyResource(Resource):
             # Recreate results
             results = []
             for result in data['results']:
-                new_result = FluencyResult(
+                new_result = ClarityResult(
                     summary_id=result['summary_id'],
                     proj_status_id=result['proj_status_id'])
                 results.append(new_result)
@@ -70,27 +70,27 @@ class FluencyResource(Resource):
         db.session.commit()
 
     def get(self, project_id):
-        project = FluencyProject.query.get(project_id)
+        project = ClarityProject.query.get(project_id)
         if project is None:
-            return abort(404, message=f"Fluency project {project_id} not found")
+            return abort(404, message=f"Clarity project {project_id} not found")
         else:
             # Get one unfinished project_status
             current_time = datetime.utcnow()
             proj_status = ProjectStatus.query\
-                .filter_by(fluency_proj_id=project.id,
+                .filter_by(clarity_proj_id=project.id,
                            is_finished=False, is_active=False)\
                 .order_by(func.rand())\
                 .first()
             if proj_status is None:
                 proj_status = ProjectStatus.query \
-                    .filter_by(fluency_proj_id=project.id, is_finished=False)\
+                    .filter_by(clarity_proj_id=project.id, is_finished=False)\
                     .filter(ProjectStatus.expired_in < current_time)\
                     .order_by(func.rand())\
                     .first()
             if proj_status is None:
                 return abort(404, message=f"No project status is opened.")
             # Get related results
-            results = FluencyResult.query\
+            results = ClarityResult.query\
                 .filter_by(proj_status_id=proj_status.id, is_invalid=False)\
                 .all()
 
@@ -102,7 +102,7 @@ class FluencyResource(Resource):
             # Get random sanity summaries
             # The function rand() is specific to MySql only (https://stackoverflow.com/q/60805)
             sanity_summ = SanitySummary.query.order_by(func.rand()).first()
-            fluency = FluencyObj(
+            clarity = ClarityObj(
                 res_sums=res_sums,
                 sanity_summ=sanity_summ,
                 proj_status=proj_status)
@@ -111,6 +111,6 @@ class FluencyResource(Resource):
             proj_status.is_active = True
             proj_status.expired_in = datetime.utcnow() + timedelta(minutes=project.expire_duration)
             db.session.commit()
-            return FluencySchema().dump(fluency)
+            return ClaritySchema().dump(clarity)
 
 

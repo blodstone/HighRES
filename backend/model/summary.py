@@ -44,21 +44,22 @@ class SummaryGroupList(db.Model):
     """
     __tablename__ = 'summary_group_list'
     id = db.Column(db.INTEGER, primary_key=True, nullable=False)
-    proj_id = db.Column(db.INTEGER, db.ForeignKey('fluency_project.id'), nullable=False)
+    fluency_proj_id = db.Column(db.INTEGER, db.ForeignKey('fluency_project.id'), nullable=True)
+    clarity_proj_id = db.Column(db.INTEGER, db.ForeignKey('clarity_project.id'), nullable=True)
     summ_group_id = db.Column(db.INTEGER, db.ForeignKey('summary_group.id'), nullable=False)
 
 
 class SanitySummary(db.Model):
     """
     For sanity checking where user's submission is deemed valid
-    if the best_summary >= avg_summary > worst_summary
+    if the good_summary >= mediocre_summary > bad_summary
     """
     __tablename__ = 'sanity_summary'
 
     id = db.Column(db.INTEGER, primary_key=True, nullable=False)
-    best_summary = db.Column(db.Text, nullable=False)
-    avg_summary = db.Column(db.Text, nullable=False)
-    worst_summary = db.Column(db.Text, nullable=False)
+    good_summary = db.Column(db.Text, nullable=False)
+    mediocre_summary = db.Column(db.Text, nullable=False)
+    bad_summary = db.Column(db.Text, nullable=False)
 
     dataset_id = db.Column(db.INTEGER, db.ForeignKey('dataset.id'), nullable=False)
 

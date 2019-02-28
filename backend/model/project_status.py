@@ -1,5 +1,5 @@
 from backend.model import db, ma
-from backend.model.result import FluencyResult
+from backend.model.result import FluencyResult, ClarityResult
 
 
 class ProjectStatus(db.Model):
@@ -15,10 +15,9 @@ class ProjectStatus(db.Model):
     validity = db.Column(db.Boolean, nullable=True, default=False)
     mturk_code = db.Column(db.String(255), nullable=True)
 
-    best_summ_score = db.Column(db.INTEGER, nullable=True)
+    good_summ_score = db.Column(db.INTEGER, nullable=True)
     mediocre_summ_score = db.Column(db.INTEGER, nullable=True)
-    worst_summ_score = db.Column(db.INTEGER, nullable=True)
-
+    bad_summ_score = db.Column(db.INTEGER, nullable=True)
 
     expired_in = db.Column(db.DateTime, nullable=True)
     # Used in informativeness and fluency project
@@ -30,8 +29,10 @@ class ProjectStatus(db.Model):
 
     eval_proj_id = db.Column(db.INTEGER, db.ForeignKey('evaluation_project.id'), nullable=True)
     fluency_proj_id = db.Column(db.INTEGER, db.ForeignKey('fluency_project.id'), nullable=True)
+    clarity_proj_id = db.Column(db.INTEGER, db.ForeignKey('clarity_project.id'), nullable=True)
     sanity_summ_id = db.Column(db.INTEGER, db.ForeignKey('sanity_summary.id'), nullable=True)
-    results = db.relationship('FluencyResult', cascade='delete')
+    fluency_results = db.relationship('FluencyResult', cascade='delete')
+    clarity_results = db.relationship('ClarityResult', cascade='delete')
     # ann_proj_id = db.Column(db.INTEGER, db.ForeignKey('annotation_project.id'), nullable=True)
 
 

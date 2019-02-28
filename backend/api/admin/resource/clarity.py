@@ -5,9 +5,9 @@ from flask import request
 from flask_restful import Resource, abort
 
 from backend.model.dataset import Dataset, DatasetSchema
-from backend.model.project import FluencyProject
+from backend.model.project import ClarityProject
 from backend.model.project_status import ProjectStatus
-from backend.model.result import FluencyResult
+from backend.model.result import ClarityResult
 from backend.model.summary import SummaryGroupList, SummaryGroup
 from backend.model import db
 
@@ -25,7 +25,7 @@ class DatasetsResource(Resource):
             abort(404, message='Empty datasets or summary groups!')
 
 
-class FluencyResource(Resource):
+class ClarityResource(Resource):
     """
     Resource for project
     """
@@ -35,7 +35,7 @@ class FluencyResource(Resource):
         self.__create_project_result(project)
 
     def delete(self, project_id):
-        project = FluencyProject.query.get(project_id)
+        project = ClarityProject.query.get(project_id)
         if project:
             db.session.delete(project)
             db.session.commit()
@@ -44,7 +44,7 @@ class FluencyResource(Resource):
 
     def __create_project(self, project_json):
         # noinspection PyArgumentList
-        new_project = FluencyProject(
+        new_project = ClarityProject(
             name=project_json['name'],
             category=project_json['category'],
             expire_duration=project_json['expire_duration'],
@@ -56,7 +56,7 @@ class FluencyResource(Resource):
         for summ_group in project_json['summ_group_list']:
             new_summ_group_list = SummaryGroupList(
                 summ_group_id=summ_group['id'],
-                fluency_proj_id=new_project.id
+                clarity_proj_id=new_project.id
             )
             summ_group_lists.append(new_summ_group_list)
         db.session.bulk_save_objects(summ_group_lists)
@@ -66,7 +66,7 @@ class FluencyResource(Resource):
     def __create_project_result(self, project):
         summ_groups = SummaryGroup.query\
             .join(SummaryGroupList)\
-            .join(FluencyProject)\
+            .join(ClarityProject)\
             .filter_by(id=project.id).all()
 
         for i in range(project.total_exp_results):
@@ -74,7 +74,8 @@ class FluencyResource(Resource):
             results = []
             for summ_group in summ_groups:
                 for summary in summ_group.summaries:
-                    results.append(FluencyResult(summary_id=summary.id, proj_status_id=0))
+                    results.append(ClarityResult(
+                        summary_id=summary.id, proj_status_id=0))
             shuffle(results)
 
             def chunks(l, n):
@@ -93,7 +94,7 @@ class FluencyResource(Resource):
                 # For each chunk assign a project status
                 new_proj_status = ProjectStatus(
                     mturk_code=mturk_code,
-                    fluency_proj_id=project.id,
+                    clarity_proj_id=project.id,
                 )
                 db.session.add(new_proj_status)
                 db.session.commit()

@@ -6,9 +6,11 @@
             <b-input name="name" expanded v-model="project.name"></b-input>
         </b-field>
         <b-field horizontal label="Category">
-            <b-select placeholder="Select evaluation category" v-model="project.category"
+            <b-select placeholder="Select evaluation category"
+                      v-model="project.category"
                       icon="wrench" icon-pack="fas">
                 <option value="Fluency">Fluency</option>
+                <option value="Clarity">Clarity</option>
             </b-select>
         </b-field>
         <b-field horizontal label="Dataset" v-if="datasets">
@@ -66,20 +68,37 @@ export default {
   },
   methods: {
     createProject() {
-      axios.put('admin/fluency', this.project)
-        .then(() => {
-          this.$toast.open({
-            message: 'Project created!',
-            type: 'is-success',
+      if (this.project.category === 'Fluency') {
+        axios.put('admin/fluency', this.project)
+          .then(() => {
+            this.$toast.open({
+              message: 'Project created!',
+              type: 'is-success',
+            });
+            this.$router.push({ name: 'manage' });
+          })
+          .catch(() => {
+            this.$toast.open({
+              message: 'Project is not created! Something is wrong',
+              type: 'is-danger',
+            });
           });
-          this.$router.push({ name: 'manage' });
-        })
-        .catch(() => {
-          this.$toast.open({
-            message: 'Project is not created! Something is wrong',
-            type: 'is-danger',
+      } else if (this.project.category === 'Clarity') {
+        axios.put('admin/clarity', this.project)
+          .then(() => {
+            this.$toast.open({
+              message: 'Project created!',
+              type: 'is-success',
+            });
+            this.$router.push({ name: 'manage' });
+          })
+          .catch(() => {
+            this.$toast.open({
+              message: 'Project is not created! Something is wrong',
+              type: 'is-danger',
+            });
           });
-        });
+      }
     },
   },
   mounted() {
