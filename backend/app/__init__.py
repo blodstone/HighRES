@@ -163,9 +163,9 @@ def init_db(dataset_path, db):
         with open(file_path, 'r') as infile:
             json_infile = json.load(infile)
             sanity_summaries.append(SanitySummary(
-                best_summary=json_infile['best'].lower(),
-                avg_summary=json_infile['average'].lower(),
-                worst_summary=json_infile['worst'].lower(),
+                good_summary=json_infile['best'].lower(),
+                mediocre_summary=json_infile['average'].lower(),
+                bad_summary=json_infile['worst'].lower(),
                 dataset_id=dataset.id
             ))
     db.session.bulk_save_objects(sanity_summaries)

@@ -41,3 +41,17 @@ class FluencyProject(BaseProject, db.Model):
 class FluencyProjectSchema(ma.ModelSchema):
     class Meta:
         model = FluencyProject
+
+
+class ClarityProject(BaseProject, db.Model):
+    __tablename__ = 'clarity_project'
+
+    n_summaries = db.Column(db.Integer, default=5)
+    expire_duration = db.Column(db.INTEGER, nullable=False, default=3)
+    summary_group_lists = db.relationship('SummaryGroupList', cascade='delete')
+    proj_statuses = db.relationship('ProjectStatus', cascade='delete')
+
+
+class ClarityProjectSchema(ma.ModelSchema):
+    class Meta:
+        model = ClarityProject

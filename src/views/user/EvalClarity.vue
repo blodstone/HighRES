@@ -39,25 +39,27 @@
                         </p>
                         <p class="my-text">
                             <b-tooltip
-                                    label="The summary should sound natural
-                                    and has no grammar-related problem that
-                                    makes the text difficult to read. ">
+                                    label="There should be no difficulties in
+                                    identifying the referents of the noun phrases
+                                    (every noun/place/event should be well-specified)
+                                    or understanding the meaning of the sentence.">
                                 <b-icon
                                     pack="fas"
                                     icon="info-circle"
                                     size="is-small">
                                 </b-icon>
                             </b-tooltip>
-                            The summary is <strong>fluent</strong>.</p>
+                          The summary is a <strong>clear</strong>.
+                        </p>
                         <div class="level" align="center"
                              style="margin-bottom: 1.8rem; margin-top: 1.8rem;">
                             <span class="level-left">
                                 <label class="label is-small">Strongly <br/> disagree</label>
                             </span>
                             <span class="level-item">
-                           <vue-slider :min=1 :max=100
-                                       v-model="res_sums[page.current - 1].result.fluency"
-                                       v-if="show" width="100%"></vue-slider>
+                            <vue-slider :min=1 :max=100
+                                        v-model="res_sums[page.current - 1].result.clarity"
+                                        v-if="show" width="100%"></vue-slider>
                             </span>
                             <span class="level-right">
                                 <label class="label is-small">Strongly <br/> agree</label>
@@ -107,7 +109,7 @@
 <script>
 /* eslint-disable camelcase */
 // @ is an alias to /src
-import LandingFluency from '@/views/user/LandingFluency.vue';
+import LandingClarity from '@/views/user/LandingClarity.vue';
 import BRadio from 'buefy/src/components/radio/Radio.vue';
 import BTooltip from 'buefy/src/components/tooltip/Tooltip.vue';
 import BIcon from 'buefy/src/components/icon/Icon.vue';
@@ -128,7 +130,7 @@ function insertSanitySumms() {
   this.arr.sort();
   this.res_sums.splice(this.arr[0], 0, {
     result: {
-      fluency: 50,
+      clarity: 50,
       type: 'good',
     },
     summary: {
@@ -137,7 +139,7 @@ function insertSanitySumms() {
   });
   this.res_sums.splice(this.arr[1], 0, {
     result: {
-      fluency: 50,
+      clarity: 50,
       type: 'mediocre',
     },
     summary: {
@@ -146,7 +148,7 @@ function insertSanitySumms() {
   });
   this.res_sums.splice(this.arr[2], 0, {
     result: {
-      fluency: 50,
+      clarity: 50,
       type: 'bad',
     },
     summary: {
@@ -157,7 +159,7 @@ function insertSanitySumms() {
 }
 
 async function getFile() {
-  await axios.get(`/fluency/${this.project_id}`)
+  await axios.get(`/clarity/${this.project_id}`)
     .then((response) => {
       this.sanity_summ = response.data.sanity_summ;
       this.res_sums = response.data.res_sums;
@@ -176,7 +178,7 @@ function sendResult() {
   for (let i = 0; i < this.res_sums.length; i += 1) {
     results.push(this.res_sums[i].result);
   }
-  axios.post('fluency', {
+  axios.post('clarity', {
     results,
     proj_status: this.proj_status,
   })
@@ -202,7 +204,7 @@ export default {
     BIcon,
     BTooltip,
     BRadio,
-    LandingFluency,
+    LandingClarity,
     vueSlider,
   },
   data() {
@@ -272,12 +274,12 @@ export default {
       this.start_time = new Date().getTime();
     },
     saveEvaluation() {
-      this.proj_status.good_summ_score = this.res_sums[this.arr[0]].result.fluency;
-      this.proj_status.mediocre_summ_score = this.res_sums[this.arr[1]].result.fluency;
-      this.proj_status.bad_summ_score = this.res_sums[this.arr[2]].result.fluency;
+      this.proj_status.good_summ_score = this.res_sums[this.arr[0]].result.clarity;
+      this.proj_status.mediocre_summ_score = this.res_sums[this.arr[1]].result.clarity
+      this.proj_status.bad_summ_score = this.res_sums[this.arr[2]].result.clarity;
       this.proj_status.is_finished = false;
-      if (this.res_sums[this.arr[2]].result.fluency <
-        this.res_sums[this.arr[0]].result.fluency) {
+      if (this.res_sums[this.arr[2]].result.clarity <
+        this.res_sums[this.arr[0]].result.clarity) {
         this.proj_status.validity = true;
         this.proj_status.is_finished = true;
       }
@@ -303,7 +305,7 @@ export default {
       return `${prompt}<blockquote>${this.sanity_statement}</blockquote>`;
     },
     dynamicLanding() {
-      return 'LandingFluency';
+      return 'LandingClarity';
     },
     mTurkDisplay() {
       if (this.is_mturk === '0') {

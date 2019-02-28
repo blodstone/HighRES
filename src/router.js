@@ -9,6 +9,7 @@ import Login from './views/admin/Login.vue';
 import ManageProject from './views/admin/ManageProject.vue';
 import NewProject from './components/admin/ProjectMenu/NewProject.vue';
 import NewEvaluation from './components/admin/ProjectMenu/NewEvaluation.vue';
+import EvalClarity from './views/user/EvalClarity.vue';
 import EvalFluency from './views/user/EvalFluency.vue';
 import store from './store';
 
@@ -25,6 +26,11 @@ export default new Router({
       path: '/fluency/:project_id/',
       name: 'fluency',
       component: EvalFluency,
+    },
+    {
+      path: '/clarity/:project_id/',
+      name: 'clarity',
+      component: EvalClarity,
     },
     {
       path: '/admin',
