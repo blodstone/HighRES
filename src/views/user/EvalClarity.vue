@@ -88,7 +88,7 @@
                         <div align="center">
                           <button class="button is-primary"
                                   v-on:click="saveEvaluation"
-                                  :disabled="finish_enabled">
+                                  :disabled="finish_disabled">
                             Finish
                           </button>
                         </div>
@@ -217,7 +217,7 @@ export default {
       res_sums: null,
       proj_status: null,
       sanity_summ: null,
-      finish_enabled: false,
+      finish_disabled: true,
       page: {
         current: 1,
         total: 0,
@@ -249,8 +249,9 @@ export default {
     next() {
       if (this.page.current !== this.page.total) {
         this.page.current += 1;
-      } else {
-        this.finish_enabled = true;
+      }
+      if (this.page.current === this.page.total) {
+        this.finish_disabled = false;
       }
     },
     showTest() {
