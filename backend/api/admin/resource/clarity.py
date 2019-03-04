@@ -101,6 +101,7 @@ class ClarityResource(Resource):
                 # Every results in the chunk is created in the database
                 for result in chunk:
                     result.proj_status_id = new_proj_status.id
+                    result.is_invalid = True
                 db.session.bulk_save_objects(chunk)
                 db.session.commit()
 

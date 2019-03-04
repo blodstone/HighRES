@@ -278,6 +278,8 @@ export default {
       this.proj_status.bad_summ_score = this.res_sums[this.arr[2]].result.fluency;
       this.proj_status.is_finished = false;
       if (this.res_sums[this.arr[2]].result.fluency <
+        this.res_sums[this.arr[1]].result.fluency &&
+        this.res_sums[this.arr[1]].result.fluency <
         this.res_sums[this.arr[0]].result.fluency) {
         this.proj_status.validity = true;
         this.proj_status.is_finished = true;
